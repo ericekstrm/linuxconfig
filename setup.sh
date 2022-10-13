@@ -9,6 +9,7 @@ source ~/.bashrc
 $lncom ~/linuxconfig/.ssh/config ~/.ssh/config
 $lncom ~/linuxconfig/.ssh/authorized_keys ~/.ssh/authorized_keys
 $lncom ~/linuxconfig/.profile ~/.profile
+$lncom ~/linuxconfig/.gitconfig ~/.gitconfig
 
 if [ "$DESKTOP_SESSION" == "plasma" ]
 then

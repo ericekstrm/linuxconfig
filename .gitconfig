@@ -1,0 +1,7 @@
+[user]
+	email = ericekstrm@gmail.com
+	name = eric
+[core]
+	editor = emacs
+[init]
+	defaultBranch = main
