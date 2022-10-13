@@ -6,6 +6,7 @@ lncom="ln -sfv" # symbolic link, force, verbose
 $lncom ~/linuxconfig/.emacs ~/.emacs
 $lncom ~/linuxconfig/.bashrc ~/.bashrc
 $lncom ~/linuxconfig/.ssh/config ~/.ssh/config
+$lncom ~/linuxconfig/.ssh/authorized_keys ~/.ssh/authorized_keys
 
 if [ "$DESKTOP_SESSION" == "plasma" ]
 then
