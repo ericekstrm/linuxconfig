@@ -21,6 +21,10 @@ apt -qy install default-jdk
 apt -qy install emacs-gtk
 apt -qy install python3
 apt -qy install vlc
+apt -qy install latexmk
+apt -qy install texlive-xetex
+apt -qy install texlive-lang-european
+apt -qy install texlive-fonts-extra
 
 # install vs code
 wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
