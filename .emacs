@@ -5,9 +5,12 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   '("e3daa8f18440301f3e54f2093fe15f4fe951986a8628e98dcd781efbec7a46f2" "e6f3a4a582ffb5de0471c9b640a5f0212ccf258a987ba421ae2659f1eaa39b09" "c4063322b5011829f7fdd7509979b5823e8eea2abf1fe5572ec4b7af1dd78519" default))
+   (quote
+    ("e3daa8f18440301f3e54f2093fe15f4fe951986a8628e98dcd781efbec7a46f2" "e6f3a4a582ffb5de0471c9b640a5f0212ccf258a987ba421ae2659f1eaa39b09" "c4063322b5011829f7fdd7509979b5823e8eea2abf1fe5572ec4b7af1dd78519" default)))
  '(inhibit-startup-screen t)
- '(package-selected-packages '(treemacs doom-themes telephone-line ivy use-package)))
+ '(package-selected-packages
+   (quote
+    (evil treemacs doom-themes telephone-line ivy use-package))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -29,12 +32,15 @@
 ;; https://www.emacswiki.org/emacs/SavePlace
 (save-place-mode 1)
 
+(delete-selection-mode 1)
+
 (show-paren-mode 1)
 (setq-default indent-tabs-mode nil)
 
 (setq mouse-wheel-progressive-speed nil)
 
 (global-display-line-numbers-mode)
+(setq display-line-numbers 'relative)
 
 ;; Make ESC quit prompts
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
@@ -61,19 +67,23 @@
 (global-set-key (kbd "M-j") 'windmove-left)
 (global-set-key (kbd "M-l") 'windmove-right)
 
-(keyboard-translate ?\C-i ?\H-i)
-(global-set-key (kbd "C-k") 'next-line)
-(global-set-key (kbd "H-i") 'previous-line)
-(global-set-key (kbd "C-j") 'left-char)
-(global-set-key (kbd "C-l") 'right-char)
+;(keyboard-translate ?\C-i ?\H-i)
+;(global-set-key (kbd "C-k") 'next-line)
+;(global-set-key (kbd "H-i") 'previous-line)
+;(global-set-key (kbd "C-j") 'left-char)
+;(global-set-key (kbd "C-l") 'right-char)
 
-(require 'org)
-(define-key org-mode-map (kbd "C-k") 'next-line)
-(define-key org-mode-map (kbd "C-j") 'left-char)
+;(require 'org)
+;(define-key org-mode-map (kbd "C-k") 'next-line)
+;(define-key org-mode-map (kbd "C-j") 'left-char)
 
 ;; c++ mode for .h files
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
 (add-to-list 'auto-mode-alist '("\\.tcc\\'" . c++-mode))
+
+;; ====================
+;; ====| Packages |====
+;; ====================
 
 ;; Setup to be able to use packages
 (require 'package)
@@ -135,3 +145,9 @@
     
 (global-set-key [f8] 'treemacs)
 
+;; Download Evil
+(unless (package-installed-p 'evil)
+  (package-install 'evil))
+;; Enable Evil
+(require 'evil)
+(evil-mode 1)
