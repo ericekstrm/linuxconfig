@@ -19,31 +19,37 @@
  ;; If there is more than one, they won't work right.
  )
 
-(setq initial-frame-alist '((top . 10) (left . 1930) (width . 100) (height . 60)))
+; ==================
+; ===|  Basics   |==
+; ==================
+
+;(setq initial-frame-alist '((top . 10) (left . 1930) (width . 100) (height . 60)))
 
 (menu-bar-mode -1)      ; Disable menubar
 (tool-bar-mode -1)      ; Disable toolbar
 (scroll-bar-mode -1)    ; Disable visible scrollbar
 (horizontal-scroll-bar-mode -1)
 
+;; Set unique names for buffers with the same name
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'forward)
 
-;; https://www.emacswiki.org/emacs/SavePlace
 (save-place-mode 1)
-
 (delete-selection-mode 1)
 
+;; Show matching parenthesis when selecting one.
 (show-paren-mode 1)
 (setq-default indent-tabs-mode nil)
+(setq show-paren-delay 0)
 
 (setq mouse-wheel-progressive-speed nil)
 
+;; Use relative line numbers in all files
 (global-display-line-numbers-mode)
 (setq display-line-numbers 'relative)
 
 ;; Make ESC quit prompts
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+;(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
 ;; Sets font size to 10pt
 (set-face-attribute 'default nil :height 90)
@@ -52,34 +58,29 @@
 (add-hook 'text-mode-hook #'auto-fill-mode)
 (setq-default fill-column 90)
 
+;; Formats the window title
+;(setq frame-title-format '(buffer-file-name "Emacs %b (%f)"))
+
+
+; ===================
+; ====|   C++     |==
+; ===================
+
 ;; C++ formating
 (setq c-default-style "bsd")
 (setq indent-tabs-mode nil)
 (setq-default c-basic-offset 4)
 (c-set-offset 'innamespace 0)
-
-;; Formats the window title
-;;(setq frame-title-format '(buffer-file-name "Emacs %b (%f)"))
-
-;; awesome keybindings to move between buffers
-(global-set-key (kbd "M-k") 'windmove-down)
-(global-set-key (kbd "M-i") 'windmove-up)
-(global-set-key (kbd "M-j") 'windmove-left)
-(global-set-key (kbd "M-l") 'windmove-right)
-
-;(keyboard-translate ?\C-i ?\H-i)
-;(global-set-key (kbd "C-k") 'next-line)
-;(global-set-key (kbd "H-i") 'previous-line)
-;(global-set-key (kbd "C-j") 'left-char)
-;(global-set-key (kbd "C-l") 'right-char)
-
-;(require 'org)
-;(define-key org-mode-map (kbd "C-k") 'next-line)
-;(define-key org-mode-map (kbd "C-j") 'left-char)
-
 ;; c++ mode for .h files
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
 (add-to-list 'auto-mode-alist '("\\.tcc\\'" . c++-mode))
+
+;; awesome keybindings to move between buffers
+(global-set-key (kbd "M-j") 'windmove-down)
+(global-set-key (kbd "M-k") 'windmove-up)
+(global-set-key (kbd "M-h") 'windmove-left)
+(global-set-key (kbd "M-l") 'windmove-right)
+
 
 ;; ====================
 ;; ====| Packages |====
@@ -151,3 +152,4 @@
 ;; Enable Evil
 (require 'evil)
 (evil-mode 1)
+; https://github.com/emacs-evil/evil-collection ?
