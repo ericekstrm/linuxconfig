@@ -23,7 +23,7 @@
 ; ===|  Basics   |==
 ; ==================
 
-;(setq initial-frame-alist '((top . 10) (left . 1930) (width . 100) (height . 60)))
+(setq initial-frame-alist '((width . 110) (height . 60)))
 
 (menu-bar-mode -1)      ; Disable menubar
 (tool-bar-mode -1)      ; Disable toolbar
@@ -143,7 +143,6 @@
         ("C-k" . treemacs-next-line)
         ("l" . treemacs-RET-action)
         ("j" . treemacs-COLLAPSE-action)))
-    
 (global-set-key [f8] 'treemacs)
 
 ;; Download Evil
@@ -153,3 +152,4 @@
 (require 'evil)
 (evil-mode 1)
 ; https://github.com/emacs-evil/evil-collection ?
+(add-hook 'prog-mode-hook #'(lambda () (modify-syntax-entry ?_ "w")))
