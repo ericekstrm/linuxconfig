@@ -10,7 +10,7 @@
  '(inhibit-startup-screen t)
  '(package-selected-packages
    (quote
-    (evil treemacs doom-themes telephone-line ivy use-package))))
+    (evil-commentary evil-surround key-chord evil treemacs doom-themes telephone-line ivy use-package))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -45,8 +45,8 @@
 (setq mouse-wheel-progressive-speed nil)
 
 ;; Use relative line numbers in all files
+(setq display-line-numbers-type 'relative)
 (global-display-line-numbers-mode)
-(setq display-line-numbers 'relative)
 
 ;; Make ESC quit prompts
 ;(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
@@ -153,3 +153,21 @@
 (evil-mode 1)
 ; https://github.com/emacs-evil/evil-collection ?
 (add-hook 'prog-mode-hook #'(lambda () (modify-syntax-entry ?_ "w")))
+
+(use-package evil-surround
+  :ensure t
+  :config
+  (global-evil-surround-mode 1))
+(use-package evil-commentary
+  :ensure t
+  :config
+  (evil-commentary-mode))
+  
+(unless (package-installed-p 'key-chord)
+  (package-install 'key-chord))
+(require 'key-chord)
+(key-chord-mode 1)
+;;Exit insert mode by pressing j and then j quickly
+(setq key-chord-two-keys-delay 0.5)
+(key-chord-define evil-insert-state-map "jj" 'evil-normal-state)
+(key-chord-mode 1)
