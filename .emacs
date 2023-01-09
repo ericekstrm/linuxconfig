@@ -153,6 +153,7 @@
 (evil-mode 1)
 ; https://github.com/emacs-evil/evil-collection ?
 (add-hook 'prog-mode-hook #'(lambda () (modify-syntax-entry ?_ "w")))
+(define-key evil-normal-state-map (kbd "TAB") 'indent-for-tab-command)
 
 (use-package evil-surround
   :ensure t
