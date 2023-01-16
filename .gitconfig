@@ -1,6 +1,7 @@
 [user]
-	email = ericekstrm@gmail.com
+	email = eric.ekstrom@liu.se
 	name = eric
+	name = Eric
 [core]
 	editor = emacs
 [init]
