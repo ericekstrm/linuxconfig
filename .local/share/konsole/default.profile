@@ -18,7 +18,7 @@ TerminalCenter=false
 TerminalMargin=2
 
 [Scrolling]
-HistoryMode=1
+HistoryMode=2
 ScrollBarPosition=1
 
 [Terminal Features]

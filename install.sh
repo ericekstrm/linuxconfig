@@ -25,6 +25,8 @@ apt -qy install latexmk
 apt -qy install texlive-xetex
 apt -qy install texlive-lang-european
 apt -qy install texlive-fonts-extra
+apt -qy install texlive-full
+apt -qy install texlive-extra
 
 # install vs code
 wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
