@@ -74,8 +74,8 @@ alias s="ls"
 alias ..='cd ..'
 
 export EDITOR=emacs
-
 alias getlab='~/upp/getlab-cli/staff_cli.py'
 
-alias g++='g++ -Wall -Wextra -Weffc++ -Wold-style-cast -Woverloaded-virtual -std=c++2a -pedantic -g'
+# alias g++='g++ -Wall -Wextra -Weffc++ -Wold-style-cast -Woverloaded-virtual -std=c++2a -pedantic -g'
+alias g++='g++-10 -Wall -Wextra -Weffc++ -Wold-style-cast -Woverloaded-virtual -std=c++20 -pedantic -g'
 alias make='make -j32'
