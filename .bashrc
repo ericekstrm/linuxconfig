@@ -76,6 +76,13 @@ alias ..='cd ..'
 export EDITOR=emacs
 alias getlab='~/upp/getlab-cli/staff_cli.py'
 
-# alias g++='g++ -Wall -Wextra -Weffc++ -Wold-style-cast -Woverloaded-virtual -std=c++2a -pedantic -g'
 alias g++='g++-10 -Wall -Wextra -Weffc++ -Wold-style-cast -Woverloaded-virtual -std=c++20 -pedantic -g'
+alias g++='g++ -Wall -Wextra -Weffc++ -Wold-style-cast -Woverloaded-virtual -std=c++2a -pedantic -g'
+alias gcc='gcc -Wall -Wextra -std=c99 -pedantic -g'
 alias make='make -j32'
+
+
+
+# Pintos stuff
+export PATH="${HOME}/pintos/src/utils/:${PATH}/"
+alias gcc='gcc -m32 -Wall -Wextra -std=c99 -pedantic -g'
