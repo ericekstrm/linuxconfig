@@ -22,8 +22,6 @@
 ; ===|  Basics   |==
 ; ==================
 
-(setq initial-frame-alist '((width . 110) (height . 60)))
-
 (menu-bar-mode -1)      ; Disable menubar
 (tool-bar-mode -1)      ; Disable toolbar
 (scroll-bar-mode -1)    ; Disable visible scrollbar
@@ -41,17 +39,12 @@
 (setq-default indent-tabs-mode nil)
 (setq show-paren-delay 0)
 
+;; Disable scroll acceleration
 (setq mouse-wheel-progressive-speed nil)
 
 ;; Use relative line numbers in all files
 (setq display-line-numbers-type 'relative)
 (global-display-line-numbers-mode)
-
-;; Make ESC quit prompts
-;(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-
-;; Sets font size to 10pt
-(set-face-attribute 'default nil :height 90)
 
 ;; Breaks line at 90 characters when in text mode 
 (add-hook 'text-mode-hook #'auto-fill-mode)
@@ -60,6 +53,14 @@
 ;; Formats the window title
 ;(setq frame-title-format '(buffer-file-name "Emacs %b (%f)"))
 
+;; Set font size based on the current machine
+(setq machine-name (system-name))
+(set-face-attribute 'default nil :height 90)
+(pcase machine-name
+  ("kit" (set-face-attribute 'default nil :height 130))
+  ("kube" (set-face-attribute 'default nil :height 90)))
+;; Set initial window size
+(setq initial-frame-alist '((width . 110) (height . 60)))
 
 ; ===================
 ; ====|   C++     |==
