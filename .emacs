@@ -5,12 +5,11 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   (quote
-    ("e3daa8f18440301f3e54f2093fe15f4fe951986a8628e98dcd781efbec7a46f2" "e6f3a4a582ffb5de0471c9b640a5f0212ccf258a987ba421ae2659f1eaa39b09" "c4063322b5011829f7fdd7509979b5823e8eea2abf1fe5572ec4b7af1dd78519" default)))
+   '("e3daa8f18440301f3e54f2093fe15f4fe951986a8628e98dcd781efbec7a46f2" "e6f3a4a582ffb5de0471c9b640a5f0212ccf258a987ba421ae2659f1eaa39b09" "c4063322b5011829f7fdd7509979b5823e8eea2abf1fe5572ec4b7af1dd78519" default))
  '(inhibit-startup-screen t)
+ '(ispell-dictionary nil)
  '(package-selected-packages
-   (quote
-    (evil-commentary evil-surround key-chord evil treemacs doom-themes telephone-line ivy use-package))))
+   '(swiper evil-collection evil-commentary evil-surround key-chord evil treemacs doom-themes telephone-line ivy use-package)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -103,12 +102,14 @@
 (use-package ivy
   :bind (:map ivy-minibuffer-map
          ("TAB" . ivy-alt-done)
-         ("H-i" . ivy-previous-line)
-         ("C-k" . ivy-next-line)
+         ("C-k" . ivy-previous-line)
+         ("C-j" . ivy-next-line)
          :map ivy-switch-buffer-map
-         ("H-i" . ivy-previous-line)
-         ("C-k" . ivy-next-line)))
+         ("C-k" . ivy-previous-line)
+         ("C-j" . ivy-next-line)))
 (ivy-mode 1)
+(setq ivy-use-virtual-buffers t)
+(setq ivy-re-builders-alist '((t . ivy--regex-ignore-order)))
 
 ;; Set a cool mode line style
 ;; https://github.com/dbordak/telephone-line
@@ -139,22 +140,37 @@
         ("M-l" . windmove-right)
         ("i" . treemacs-previous-line)
         ("k" . treemacs-next-line)
-        ("C-i" . treemacs-previous-line)
-        ("C-k" . treemacs-next-line)
         ("l" . treemacs-RET-action)
-        ("j" . treemacs-COLLAPSE-action)))
+        ("h" . treemacs-COLLAPSE-action)))
 (global-set-key [f8] 'treemacs)
 
-;; Download Evil
-(unless (package-installed-p 'evil)
-  (package-install 'evil))
-;; Enable Evil
-(require 'evil)
-(evil-mode 1)
-; https://github.com/emacs-evil/evil-collection ?
-(add-hook 'prog-mode-hook #'(lambda () (modify-syntax-entry ?_ "w")))
-(define-key evil-normal-state-map (kbd "TAB") 'indent-for-tab-command)
+;; =====================
+;; ====| Evil Mode |====
+;; =====================
 
+;; Install Evil
+(use-package evil
+  :ensure t
+  :init
+  (setq evil-want-integration t)
+  (setq evil-want-keybinding nil)
+  :config
+  (evil-mode 1))
+;; Install extra evil keybindings e-package evil
+
+(use-package evil-collection
+  :after evil
+  :ensure t
+  :config
+  (evil-collection-init 'ivy))
+
+;; Adds '_' to be part of words in prog-mode
+(add-hook 'prog-mode-hook #'(lambda () (modify-syntax-entry ?_ "w")))
+;; Restores tab functionality to normal and visual mode
+(define-key evil-normal-state-map (kbd "TAB") 'indent-for-tab-command)
+(define-key evil-visual-state-map (kbd "TAB") 'indent-for-tab-command)
+
+;; Extra vim functonality
 (use-package evil-surround
   :ensure t
   :config
@@ -163,12 +179,11 @@
   :ensure t
   :config
   (evil-commentary-mode))
-  
-(unless (package-installed-p 'key-chord)
-  (package-install 'key-chord))
-(require 'key-chord)
-(key-chord-mode 1)
+
 ;;Exit insert mode by pressing j and then j quickly
-(setq key-chord-two-keys-delay 0.5)
-(key-chord-define evil-insert-state-map "jj" 'evil-normal-state)
-(key-chord-mode 1)
+(use-package key-chord
+  :ensure t
+  :config
+  (setq key-chord-two-keys-delay 0.5)
+  (key-chord-define evil-insert-state-map "jj" 'evil-normal-state)
+  (key-chord-mode 1))
