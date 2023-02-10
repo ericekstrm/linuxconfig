@@ -9,7 +9,7 @@
  '(inhibit-startup-screen t)
  '(ispell-dictionary nil)
  '(package-selected-packages
-   '(swiper evil-collection evil-commentary evil-surround key-chord evil treemacs doom-themes telephone-line ivy use-package)))
+   '(company complany swiper evil-collection evil-commentary evil-surround key-chord evil treemacs doom-themes telephone-line ivy use-package)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -62,6 +62,13 @@
 ;; Set initial window size
 (setq initial-frame-alist '((width . 110) (height . 60)))
 
+
+;; awesome keybindings to move between buffers
+(global-set-key (kbd "M-j") 'windmove-down)
+(global-set-key (kbd "M-k") 'windmove-up)
+(global-set-key (kbd "M-h") 'windmove-left)
+(global-set-key (kbd "M-l") 'windmove-right)
+
 ; ===================
 ; ====|   C++     |==
 ; ===================
@@ -74,13 +81,6 @@
 ;; c++ mode for .h files
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
 (add-to-list 'auto-mode-alist '("\\.tcc\\'" . c++-mode))
-
-;; awesome keybindings to move between buffers
-(global-set-key (kbd "M-j") 'windmove-down)
-(global-set-key (kbd "M-k") 'windmove-up)
-(global-set-key (kbd "M-h") 'windmove-left)
-(global-set-key (kbd "M-l") 'windmove-right)
-
 
 ;; ====================
 ;; ====| Packages |====
@@ -99,18 +99,24 @@
 (require 'use-package)
 (setq use-package-always-ensure t)
 
+(use-package use-package-chords
+  :config (key-chord-mode 1)
+  :custom (key-chord-two-keys-delay 0.5))
+
 ;; Better autocomplete in minibuffers
 (use-package ivy
+  :init
+  (ivy-mode 1)
   :bind (:map ivy-minibuffer-map
          ("TAB" . ivy-alt-done)
          ("C-k" . ivy-previous-line)
          ("C-j" . ivy-next-line)
          :map ivy-switch-buffer-map
          ("C-k" . ivy-previous-line)
-         ("C-j" . ivy-next-line)))
-(ivy-mode 1)
-(setq ivy-use-virtual-buffers t)
-(setq ivy-re-builders-alist '((t . ivy--regex-ignore-order)))
+         ("C-j" . ivy-next-line))
+  :custom
+  (ivy-use-virtual-buffers t)                                ; add recent files to list of buffers
+  (ivy-re-builders-alist '((t . ivy--regex-ignore-order))))  ; add some flexibility to ivy search
 
 ;; Set a cool mode line style
 ;; https://github.com/dbordak/telephone-line
@@ -145,25 +151,35 @@
         ("h" . treemacs-COLLAPSE-action)))
 (global-set-key [f8] 'treemacs)
 
+;; Auto complete in prog mode
+;; (use-package company
+;;   :custom
+;;   (company-backends '((company-capf
+;;                        company-keywords
+;;                        company-semantic)))
+;;   :hook prog-mode)
+
+;; Projectile???
+
+;; Magit
+
 ;; =====================
 ;; ====| Evil Mode |====
 ;; =====================
-
 ;; Install Evil
 (use-package evil
-  :ensure t
   :init
-  (setq evil-want-integration t)
-  (setq evil-want-keybinding nil)
-  :config
-  (evil-mode 1))
-;; Install extra evil keybindings e-package evil
+  (evil-mode 1)
+  :custom
+  (evil-want-integration t)
+  (evil-want-keybinding nil)
+  :chords (:map evil-insert-state-map
+                ("jj" . evil-normal-state)))
 
 (use-package evil-collection
   :after evil
-  :ensure t
   :config
-  (evil-collection-init 'ivy))
+  (evil-collection-init '(company ivy org)))
 
 ;; Adds '_' to be part of words in prog-mode
 (add-hook 'prog-mode-hook #'(lambda () (modify-syntax-entry ?_ "w")))
@@ -173,18 +189,8 @@
 
 ;; Extra vim functonality
 (use-package evil-surround
-  :ensure t
   :config
   (global-evil-surround-mode 1))
 (use-package evil-commentary
-  :ensure t
   :config
   (evil-commentary-mode))
-
-;;Exit insert mode by pressing j and then j quickly
-(use-package key-chord
-  :ensure t
-  :config
-  (setq key-chord-two-keys-delay 0.5)
-  (key-chord-define evil-insert-state-map "jj" 'evil-normal-state)
-  (key-chord-mode 1))
