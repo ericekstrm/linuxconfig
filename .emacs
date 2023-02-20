@@ -179,7 +179,7 @@
 (use-package evil-collection
   :after evil
   :config
-  (evil-collection-init '(company ivy org)))
+  (evil-collection-init '(buff-menu company dired ediff ivy org))
 
 ;; Adds '_' to be part of words in prog-mode
 (add-hook 'prog-mode-hook #'(lambda () (modify-syntax-entry ?_ "w")))
@@ -194,3 +194,12 @@
 (use-package evil-commentary
   :config
   (evil-commentary-mode))
+
+(winner-mode)
+(use-package ediff
+  :custom
+  (ediff-window-setup-function 'ediff-setup-windows-plain)
+  (ediff-split-window-function 'split-window-horizontally)
+  (ediff-diff-options "-w")
+  :init
+  (add-hook 'ediff-after-quit-hook-internal 'winner-undo))
