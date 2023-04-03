@@ -9,7 +9,7 @@
  '(inhibit-startup-screen t)
  '(ispell-dictionary nil)
  '(package-selected-packages
-   '(undo-tree fireplace company complany swiper evil-collection evil-commentary evil-surround key-chord evil treemacs doom-themes telephone-line ivy use-package)))
+   '(ivy-rich counsel undo-tree fireplace company complany swiper evil-collection evil-commentary evil-surround key-chord evil treemacs doom-themes telephone-line ivy use-package)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -96,7 +96,7 @@
 ;; Profiler for use-package. (get report with 'use-package-report'
 (setq use-package-compute-statistics t)
 
-;; awesome keybindings to move between buffers
+;; keybindings to move between buffers
 (use-package windmove
   :bind
   ((("M-j" . windmove-down)
@@ -108,27 +108,8 @@
   :config (key-chord-mode 1)
   :custom (key-chord-two-keys-delay 0.5))
 
-;; Better autocomplete in minibuffers
-(use-package ivy
-  :init
-  (ivy-mode 1)
-  :bind (:map ivy-minibuffer-map
-         ("TAB" . ivy-alt-done)
-         ("C-k" . ivy-previous-line)
-         ("C-j" . ivy-next-line)
-         :map ivy-switch-buffer-map
-         ("C-k" . ivy-previous-line)
-         ("C-j" . ivy-next-line))
-  :custom
-  (ivy-use-virtual-buffers t)                                ; add recent files to list of buffers
-  (ivy-re-builders-alist '((t . ivy--regex-ignore-order))))  ; add some flexibility to ivy search
-;; TODO: Ivy command explanation in minibuffer??
-
-;; TODO: check out org-modern.
-;; https://github.com/minad/org-modern
 ;; TODO: check out engine-mode
 ;; https://github.com/hrs/engine-mode
-;; TODO: evil redo
 
 ;; Set a cool mode line style
 ;; https://github.com/dbordak/telephone-line
@@ -196,6 +177,39 @@
 
 ;; TODO: Projectile???
 ;; TODO: Magit
+
+;; ====================
+;; ====|   Ivy    |====
+;; ====================
+
+;; Better autocomplete in minibuffers
+(use-package ivy
+  :init
+  (ivy-mode 1)
+  :bind (:map ivy-minibuffer-map
+         ("TAB" . ivy-alt-done)
+         ("C-k" . ivy-previous-line)
+         ("C-j" . ivy-next-line)
+         :map ivy-switch-buffer-map
+         ("C-k" . ivy-previous-line)
+         ("C-j" . ivy-next-line))
+  :custom
+  (ivy-use-virtual-buffers t)                                ; add recent files to list of buffers
+  (ivy-re-builders-alist '((t . ivy--regex-ignore-order))))  ; add some flexibility to ivy search
+
+(use-package counsel
+  :after ivy
+  :config (counsel-mode))
+(setq ivy-initial-inputs-alist nil)  ; Removes the extra '^' added by default.
+
+(use-package ivy-rich
+  :config
+  (ivy-rich-set-columns 'ivy-switch-buffer 'nil)   ; remove rich text in switch buffer.
+  (ivy-rich-mode 1))
+
+(use-package swiper
+  :after ivy
+  :bind (("C-s" . swiper)))
 
 ;; =====================
 ;; ====| Evil Mode |====
