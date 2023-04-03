@@ -9,7 +9,7 @@
  '(inhibit-startup-screen t)
  '(ispell-dictionary nil)
  '(package-selected-packages
-   '(fireplace company complany swiper evil-collection evil-commentary evil-surround key-chord evil treemacs doom-themes telephone-line ivy use-package)))
+   '(undo-tree fireplace company complany swiper evil-collection evil-commentary evil-surround key-chord evil treemacs doom-themes telephone-line ivy use-package)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -67,7 +67,7 @@
 ; ====|   C++     |==
 ; ===================
 
-; C++ formating
+;; C++ formating
 (setq c-default-style "bsd")
 (setq-default indent-tabs-mode nil)
 (setq indent-tabs-mode nil)
@@ -230,3 +230,11 @@
 (use-package evil-commentary
   :config
   (evil-commentary-mode))
+
+;; Restore redo functionality
+(use-package undo-tree
+  :after evil
+  :diminish     ; hides the mode from list of minor modes
+  :config
+  (evil-set-undo-system 'undo-tree)
+  (global-undo-tree-mode 1))
