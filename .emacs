@@ -43,6 +43,15 @@
 (show-paren-mode 1)
 (setq show-paren-delay 0)
 
+;; Move backup files out of the way, and extend the amount of backups created.
+(setq backup-directory-alist `(("." . "~/.emacs.d/backup-files")))
+(setq version-control t     ;; Use version numbers for backups.
+      kept-new-versions 10  ;; Number of newest versions to keep.
+      kept-old-versions 0   ;; Number of oldest versions to keep.
+      delete-old-versions t ;; Don't ask to delete excess backup versions.
+      backup-by-copying t)  ;; Copy all files, don't rename them
+(setq vc-make-backup-files t)
+
 ;; Disable scroll acceleration
 (setq mouse-wheel-progressive-speed nil)
 
@@ -188,6 +197,7 @@
   (ivy-mode 1)
   :bind (:map ivy-minibuffer-map
          ("TAB" . ivy-alt-done)
+         ("RET" . ivy-alt-done)
          ("C-k" . ivy-previous-line)
          ("C-j" . ivy-next-line)
          :map ivy-switch-buffer-map
@@ -251,4 +261,5 @@
   :diminish     ; hides the mode from list of minor modes
   :config
   (evil-set-undo-system 'undo-tree)
-  (global-undo-tree-mode 1))
+  (global-undo-tree-mode 1)
+  (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo-tree-files"))))
