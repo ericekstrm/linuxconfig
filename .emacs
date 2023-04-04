@@ -9,7 +9,7 @@
  '(inhibit-startup-screen t)
  '(ispell-dictionary nil)
  '(package-selected-packages
-   '(company complany swiper evil-collection evil-commentary evil-surround key-chord evil treemacs doom-themes telephone-line ivy use-package)))
+   '(ivy-rich counsel undo-tree fireplace company complany swiper evil-collection evil-commentary evil-surround key-chord evil treemacs doom-themes telephone-line ivy use-package)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -27,16 +27,20 @@
 (scroll-bar-mode -1)    ; Disable visible scrollbar
 (horizontal-scroll-bar-mode -1)
 
+;; Remember how window configurations change
+;; 'C-c left' and 'C-c right' to move between window configurations.
+(winner-mode 1)
+
 ;; Set unique names for buffers with the same name
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'forward)
 
 (save-place-mode 1)
 (delete-selection-mode 1)
+(setq sentence-end-double-space nil)
 
 ;; Show matching parenthesis when selecting one.
 (show-paren-mode 1)
-(setq-default indent-tabs-mode nil)
 (setq show-paren-delay 0)
 
 ;; Disable scroll acceleration
@@ -50,9 +54,6 @@
 (add-hook 'text-mode-hook #'auto-fill-mode)
 (setq-default fill-column 90)
 
-;; Formats the window title
-;(setq frame-title-format '(buffer-file-name "Emacs %b (%f)"))
-
 ;; Set font size based on the current machine
 (setq machine-name (system-name))
 (set-face-attribute 'default nil :height 90)
@@ -62,23 +63,17 @@
 ;; Set initial window size
 (setq initial-frame-alist '((width . 110) (height . 60)))
 
-
-;; awesome keybindings to move between buffers
-(global-set-key (kbd "M-j") 'windmove-down)
-(global-set-key (kbd "M-k") 'windmove-up)
-(global-set-key (kbd "M-h") 'windmove-left)
-(global-set-key (kbd "M-l") 'windmove-right)
-
 ; ===================
 ; ====|   C++     |==
 ; ===================
 
 ;; C++ formating
 (setq c-default-style "bsd")
+(setq-default indent-tabs-mode nil)
 (setq indent-tabs-mode nil)
 (setq-default c-basic-offset 4)
 (c-set-offset 'innamespace 0)
-;; c++ mode for .h files
+;; c++ mode for .h and .tcc files
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
 (add-to-list 'auto-mode-alist '("\\.tcc\\'" . c++-mode))
 
@@ -98,30 +93,51 @@
   (package-install 'use-package))
 (require 'use-package)
 (setq use-package-always-ensure t)
+;; Profiler for use-package. (get report with 'use-package-report'
+(setq use-package-compute-statistics t)
+
+;; keybindings to move between buffers
+(use-package windmove
+  :bind
+  ((("M-j" . windmove-down)
+    ("M-k" . windmove-up)
+    ("M-h" . windmove-left)
+    ("M-l" . windmove-right))))
 
 (use-package use-package-chords
   :config (key-chord-mode 1)
   :custom (key-chord-two-keys-delay 0.5))
 
-;; Better autocomplete in minibuffers
-(use-package ivy
-  :init
-  (ivy-mode 1)
-  :bind (:map ivy-minibuffer-map
-         ("TAB" . ivy-alt-done)
-         ("C-k" . ivy-previous-line)
-         ("C-j" . ivy-next-line)
-         :map ivy-switch-buffer-map
-         ("C-k" . ivy-previous-line)
-         ("C-j" . ivy-next-line))
-  :custom
-  (ivy-use-virtual-buffers t)                                ; add recent files to list of buffers
-  (ivy-re-builders-alist '((t . ivy--regex-ignore-order))))  ; add some flexibility to ivy search
+;; TODO: check out engine-mode
+;; https://github.com/hrs/engine-mode
 
 ;; Set a cool mode line style
 ;; https://github.com/dbordak/telephone-line
 (use-package telephone-line)
 (telephone-line-mode 1)
+
+;; TODO: Hydra för att skapa tangentbordkombinationer med en gemensam startknapp?
+
+;; TODO: style mode line
+;; (setq mode-line-format
+;;       (list
+;;        "%e"
+;;        mode-line-front-space
+;;        ;; mode-line-mule-info
+;;        ;; mode-line-client
+;;        mode-line-modified
+;;        mode-line-remote
+;;        "   "
+;;        ;; mode-line-frame-identification
+;;        mode-line-buffer-identification
+;;        "   "
+;;        mode-line-position
+;;        evil-mode-line-tag
+;;        "  "
+;;        vc-mode
+;;        mode-line-modes
+;;        mode-line-misc-info
+;;        mode-line-end-spaces))
 
 (use-package doom-themes
   :config
@@ -151,7 +167,7 @@
         ("h" . treemacs-COLLAPSE-action)))
 (global-set-key [f8] 'treemacs)
 
-;; Auto complete in prog mode
+;; TODO: Auto complete in prog mode
 ;; (use-package company
 ;;   :custom
 ;;   (company-backends '((company-capf
@@ -159,13 +175,46 @@
 ;;                        company-semantic)))
 ;;   :hook prog-mode)
 
-;; Projectile???
+;; TODO: Projectile???
+;; TODO: Magit
 
-;; Magit
+;; ====================
+;; ====|   Ivy    |====
+;; ====================
+
+;; Better autocomplete in minibuffers
+(use-package ivy
+  :init
+  (ivy-mode 1)
+  :bind (:map ivy-minibuffer-map
+         ("TAB" . ivy-alt-done)
+         ("C-k" . ivy-previous-line)
+         ("C-j" . ivy-next-line)
+         :map ivy-switch-buffer-map
+         ("C-k" . ivy-previous-line)
+         ("C-j" . ivy-next-line))
+  :custom
+  (ivy-use-virtual-buffers t)                                ; add recent files to list of buffers
+  (ivy-re-builders-alist '((t . ivy--regex-ignore-order))))  ; add some flexibility to ivy search
+
+(use-package counsel
+  :after ivy
+  :config (counsel-mode))
+(setq ivy-initial-inputs-alist nil)  ; Removes the extra '^' added by default.
+
+(use-package ivy-rich
+  :config
+  (ivy-rich-set-columns 'ivy-switch-buffer 'nil)   ; remove rich text in switch buffer.
+  (ivy-rich-mode 1))
+
+(use-package swiper
+  :after ivy
+  :bind (("C-s" . swiper)))
 
 ;; =====================
 ;; ====| Evil Mode |====
 ;; =====================
+
 ;; Install Evil
 (use-package evil
   :init
@@ -176,6 +225,7 @@
   :chords (:map evil-insert-state-map
                 ("jj" . evil-normal-state)))
 
+;; Add evil bindings for more modes
 (use-package evil-collection
   :after evil
   :config
@@ -187,7 +237,7 @@
 (define-key evil-normal-state-map (kbd "TAB") 'indent-for-tab-command)
 (define-key evil-visual-state-map (kbd "TAB") 'indent-for-tab-command)
 
-;; Extra vim functonality
+;; Extra evil functonality
 (use-package evil-surround
   :config
   (global-evil-surround-mode 1))
@@ -195,11 +245,10 @@
   :config
   (evil-commentary-mode))
 
-(winner-mode)
-(use-package ediff
-  :custom
-  (ediff-window-setup-function 'ediff-setup-windows-plain)
-  (ediff-split-window-function 'split-window-horizontally)
-  (ediff-diff-options "-w")
-  :init
-  (add-hook 'ediff-after-quit-hook-internal 'winner-undo))
+;; Restore redo functionality
+(use-package undo-tree
+  :after evil
+  :diminish     ; hides the mode from list of minor modes
+  :config
+  (evil-set-undo-system 'undo-tree)
+  (global-undo-tree-mode 1))
