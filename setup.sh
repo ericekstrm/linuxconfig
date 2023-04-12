@@ -3,7 +3,6 @@
 echo "== Setting up symlinks for config files =="
 lncom="ln -sfv" # symbolic link, force, verbose
 
-$lncom ~/linuxconfig/.emacs ~/.emacs
 $lncom ~/linuxconfig/.bashrc ~/.bashrc
 source ~/.bashrc
 $lncom ~/linuxconfig/.ssh/config ~/.ssh/config
