@@ -1,4 +1,3 @@
-
 * Basics
 ** Menubars and such
    
@@ -120,6 +119,56 @@
      (setq-default fill-column 90)
    #+end_src
    
+** LaTeX mode
+   
+   Basic settings for latex mode.
+
+   #+begin_src emacs-lisp
+     (add-to-list 'auto-mode-alist '("\\.tex\\'" . LaTeX-mode))
+
+     ;; Fungerar ej
+     ;; (add-to-list 'LaTeX-verbatim-environments "lstlisting")
+     ;; (setq LaTeX-indent-environment-list (cons '("lstlisting" current-indentation) (default-value 'LaTeX-indent-environment-list)))
+   #+end_src
+
+   Small scripts for automating latex writing
+   
+   #+begin_src emacs-lisp
+
+     ;; Insert a beamer frame
+     (defun latex-frame ()
+       (interactive)
+       (insert "\\begin{frame}[fragile]{}\n\\end{frame}")
+       (evil-open-above 1))
+
+     ;; Insert an itemize list
+     (defun latex-itemize ()
+       (interactive)
+       (evil-insert 1)
+       (insert "\\begin{itemize}")
+       (indent-for-tab-command)
+       (newline)
+       (insert "\\item")
+       (indent-for-tab-command)
+       (newline)
+       (insert "\\end{itemize}")
+       (indent-for-tab-command)
+       (previous-line)
+       (end-of-line))
+
+     ;; Insert an lstlisting
+     (defun latex-lst ()
+       (interactive)
+       (evil-insert 1)
+       (insert "\\begin{lstlisting}[style=code, title=]")
+       (indent-for-tab-command)
+       (newline 2)
+       (insert "\\end{lstlisting}")
+       (indent-for-tab-command)
+       (previous-line)
+       (beginning-of-line))
+   #+end_src
+
 * Packages
   Setup to be able to use use-package
   
