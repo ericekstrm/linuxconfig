@@ -94,6 +94,13 @@
 
 ** Org Mode
    
+   Generall org-mode settings
+
+   #+begin_src emacs-lisp
+     (setq org-log-done 'time)
+     (setq calendar-week-start-day 1)
+   #+end_src
+   
    When editing code blocks, the new buffer should open below the current one, without
    modifying other windows.
    
@@ -109,6 +116,15 @@
      (setq org-M-RET-may-split-line nil)
      (setq org-insert-heading-respect-content t)
    #+end_src
+
+*** Agenda
+
+    Select which files to search for todos in.
+
+    #+begin_src emacs-lisp
+      (setq org-agenda-files (list "~/linuxconfig/.emacs.d/emacs-config.org"
+                                   "~/alice-emacs/emacs-guide.org"))
+    #+end_src
 
 ** Text Mode
 
@@ -369,11 +385,20 @@
 | ~C-c left~  | Move to previous window configuration                       |
 | ~C-c right~ | Move the the next window configuration                      |
 
-* TODO [0%]
+* Stuff to do [16%]
 ** TODO check out Magit (for real)
 ** TODO check out the emacs package Projectile
 ** TODO Hydra för att skapa tangentbordkombinationer med en gemensam startknapp?
-** TODO style mode line
+** TODO see if [[ https://github.com/Somelauw/evil-org-mode][evil-org-mode]] is worth it
+** TODO test out org-agenda. Might be nice along with all of these TODOs 
+** DONE style mode line
+   CLOSED: [2023-04-05 ons 13:58]
+   :LOGBOOK:
+   CLOCK: [2023-04-05 ons 14:02]--[2023-04-05 ons 14:02] =>  0:00
+   :END:
+   
+   Fixed by not fixing it. Its good as is. Maybe want to change appearence of the position thingy.
+
    ;; (setq mode-line-format
    ;;       (list
    ;;        "%e"
@@ -393,5 +418,3 @@
    ;;        mode-line-modes
    ;;        mode-line-misc-info
    ;;        mode-line-end-spaces))
-** TODO see if [[ https://github.com/Somelauw/evil-org-mode][evil-org-mode]] is worth it
-** TODO test out org-agenda. Might be nice along with all of these TODOs 
