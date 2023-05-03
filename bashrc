@@ -67,6 +67,9 @@ fi
 # Weather
 alias wttr='curl https://wttr.in/link%C3%B6ping?M1Fq'
 
+# emacs alias
+alias emacs='emacsclient -nc -a=""'
+
 # colored GCC warnings and errors
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
