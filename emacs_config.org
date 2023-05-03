@@ -277,6 +277,76 @@
        (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo-tree-files"))))
    #+end_src
    
+   #+begin_src emacs-lisp
+     (defun my-evil-paren-range (count beg end type inclusive)
+       "Get minimum range of paren text object.
+     COUNT, BEG, END, TYPE is used.  If INCLUSIVE is t, the text object is inclusive.
+     FN is function to get range."
+       (let* ((parens '("()" "[]" "{}" "<>" "\"\"" "''" "``"))
+              (pos (point))
+              c1
+              c2
+              range
+              found-range)
+         (dolist (p parens)
+           (condition-case nil
+               (let* ((c1 (aref p 0))
+                      (c2 (aref p 1)))
+                 (setq range (if (eq c1 c2) (evil-select-quote c1 beg end type count inclusive)
+                               (evil-select-paren c1 c2 beg end type count inclusive))))
+             (error nil))
+           (when (and range (<= (nth 0 range) pos) (< pos (nth 1 range)))
+             (cond
+              (found-range
+               (when (< (- (nth 1 range) (nth 0 range))
+                        (- (nth 1 found-range) (nth 0 found-range)))
+                 (setf (nth 0 found-range) (nth 0 range))
+                 (setf (nth 1 found-range) (nth 1 range))))
+              (t
+               (setq found-range range)))))
+         found-range))
+
+     (evil-define-text-object my-evil-a-paren (count &optional beg end type)
+       "Select a paren."
+       :extend-selection t
+       (my-evil-paren-range count beg end type t))
+
+     (evil-define-text-object my-evil-inner-paren (count &optional beg end type)
+       "Select 'inner' paren."
+       :extend-selection nil
+       (my-evil-paren-range count beg end type nil))
+
+     (define-key evil-inner-text-objects-map "g" #'my-evil-inner-paren)
+     (define-key evil-outer-text-objects-map "g" #'my-evil-a-paren)
+   #+end_src
+   
+   #+begin_src emacs-lisp
+
+     (use-package evil-textobj-tree-sitter)
+     (use-package tree-sitter)
+     (use-package tree-sitter-langs)
+
+     (global-tree-sitter-mode t)
+
+     ;; bind `function.outer`(entire function block) to `f` for use in things like `vaf`, `yaf`
+     (define-key evil-outer-text-objects-map "f" (evil-textobj-tree-sitter-get-textobj "function.outer"))
+     ;; bind `function.inner`(function block without name and args) to `f` for use in things like `vif`, `yif`
+     (define-key evil-inner-text-objects-map "f" (evil-textobj-tree-sitter-get-textobj "function.inner"))
+
+     ;; bind `function.outer`(entire function block) to `f` for use in things like `vaf`, `yaf`
+     (define-key evil-outer-text-objects-map "c" (evil-textobj-tree-sitter-get-textobj "class.outer"))
+     ;; bind `function.inner`(function block without name and args) to `f` for use in things like `vif`, `yif`
+     (define-key evil-inner-text-objects-map "c" (evil-textobj-tree-sitter-get-textobj "class.inner"))
+
+     ;; bind `function.outer`(entire function block) to `f` for use in things like `vaf`, `yaf`
+     (define-key evil-outer-text-objects-map "a" (evil-textobj-tree-sitter-get-textobj "parameter.outer"))
+     ;; bind `function.inner`(function block without name and args) to `f` for use in things like `vif`, `yif`
+     (define-key evil-inner-text-objects-map "a" (evil-textobj-tree-sitter-get-textobj "parameter.inner"))
+
+
+
+   #+end_src
+   
 ** ivy, counsel, swiper
 
    Better autocomplete in minibuffers
