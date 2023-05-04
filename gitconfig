@@ -3,6 +3,6 @@
 	name = Eric Ekström
         username = ericekstrm
 [core]
-	editor = emacs
+	editor = emacsclient -a=""
 [init]
 	defaultBranch = main
