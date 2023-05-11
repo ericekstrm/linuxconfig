@@ -383,7 +383,8 @@
    #+begin_src emacs-lisp
      (use-package ivy-rich
        :config
-       (ivy-rich-set-columns 'ivy-switch-buffer 'nil)   ; remove rich text in switch buffer. TODO: Bug!!
+       (ivy-rich-set-columns 'ivy-switch-buffer
+                             '((ivy-switch-buffer-transformer (:width 0.35))))
        (ivy-rich-mode 1))
    #+end_src
 
