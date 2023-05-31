@@ -1,4 +1,10 @@
 * Basics
+  
+  #+begin_src emacs-lisp
+
+    (setq load-path (cons "~/linuxconfig/emacs-files" load-path))
+  #+end_src
+
 ** Menubars and such
    
    #+begin_src emacs-lisp
@@ -90,6 +96,12 @@
      ;; c++ mode for .h and .tcc files
      (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
      (add-to-list 'auto-mode-alist '("\\.tcc\\'" . c++-mode))
+   #+end_src
+   
+   #+begin_src emacs-lisp
+     (autoload 'glsl-mode "glsl-mode" nil t)
+     (add-to-list 'auto-mode-alist '("\\.frag\\'" . glsl-mode))
+     (add-to-list 'auto-mode-alist '("\\.vert\\'" . glsl-mode))
    #+end_src
 
 ** Org Mode
