@@ -4,7 +4,7 @@
 
     (setq load-path (cons "~/linuxconfig/emacs-files" load-path))
   #+end_src
-
+  
 ** Menubars and such
    
    #+begin_src emacs-lisp
@@ -23,7 +23,7 @@
    Disable scroll acceleration
 
    #+begin_src emacs-lisp
-   (setq mouse-wheel-progressive-speed nil)
+     (setq mouse-wheel-progressive-speed nil)
    #+end_src
 
    Show matching parenthesis when selecting one.
@@ -84,119 +84,6 @@
      (global-display-line-numbers-mode)
    #+end_src
 
-* Modes
-** C++ Mode
-
-   #+begin_src emacs-lisp
-     (setq c-default-style "bsd")
-     (setq-default indent-tabs-mode nil)
-     (setq indent-tabs-mode nil)
-     (setq-default c-basic-offset 4)
-     (c-set-offset 'innamespace 0)
-     ;; c++ mode for .h and .tcc files
-     (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
-     (add-to-list 'auto-mode-alist '("\\.tcc\\'" . c++-mode))
-   #+end_src
-   
-   #+begin_src emacs-lisp
-     (autoload 'glsl-mode "glsl-mode" nil t)
-     (add-to-list 'auto-mode-alist '("\\.frag\\'" . glsl-mode))
-     (add-to-list 'auto-mode-alist '("\\.vert\\'" . glsl-mode))
-   #+end_src
-
-** Org Mode
-   
-   Generall org-mode settings
-
-   #+begin_src emacs-lisp
-     (setq org-log-done 'time)
-     (setq calendar-week-start-day 1)
-   #+end_src
-   
-   When editing code blocks, the new buffer should open below the current one, without
-   modifying other windows.
-   
-   #+begin_src emacs-lisp
-     (setq org-src-window-setup 'split-window-below)
-   #+end_src
-
-   When hitting Alt-enter in a heading, the content of the current line should not be
-   moved to the new heading, and the new heading should be created below all the contents
-   of the current heading.
-
-   #+begin_src emacs-lisp
-     (setq org-M-RET-may-split-line nil)
-     (setq org-insert-heading-respect-content t)
-   #+end_src
-
-*** Agenda
-
-    Select which files to search for todos in.
-
-    #+begin_src emacs-lisp
-      (setq org-agenda-files (list "~/linuxconfig/.emacs.d/emacs-config.org"
-                                   "~/alice-emacs/emacs-guide.org"))
-    #+end_src
-
-** Text Mode
-
-   Breaks line at 90 characters.
-
-   #+begin_src emacs-lisp
-     (add-hook 'text-mode-hook #'auto-fill-mode)
-     (setq-default fill-column 90)
-   #+end_src
-   
-** LaTeX mode
-   
-   Basic settings for latex mode.
-
-   #+begin_src emacs-lisp
-     (add-to-list 'auto-mode-alist '("\\.tex\\'" . LaTeX-mode))
-
-     ;; Fungerar ej
-     ;; (add-to-list 'LaTeX-verbatim-environments "lstlisting")
-     ;; (setq LaTeX-indent-environment-list (cons '("lstlisting" current-indentation) (default-value 'LaTeX-indent-environment-list)))
-   #+end_src
-
-   Small scripts for automating latex writing
-   
-   #+begin_src emacs-lisp
-
-     ;; Insert a beamer frame
-     (defun latex-frame ()
-       (interactive)
-       (insert "\\begin{frame}[fragile]{}\n\\end{frame}")
-       (evil-open-above 1))
-
-     ;; Insert an itemize list
-     (defun latex-itemize ()
-       (interactive)
-       (evil-insert 1)
-       (insert "\\begin{itemize}")
-       (indent-for-tab-command)
-       (newline)
-       (insert "\\item")
-       (indent-for-tab-command)
-       (newline)
-       (insert "\\end{itemize}")
-       (indent-for-tab-command)
-       (previous-line)
-       (end-of-line))
-
-     ;; Insert an lstlisting
-     (defun latex-lst ()
-       (interactive)
-       (evil-insert 1)
-       (insert "\\begin{lstlisting}[style=code, title=]")
-       (indent-for-tab-command)
-       (newline 2)
-       (insert "\\end{lstlisting}")
-       (indent-for-tab-command)
-       (previous-line)
-       (beginning-of-line))
-   #+end_src
-
 * Packages
   Setup to be able to use use-package
   
@@ -223,6 +110,20 @@
       :custom (key-chord-two-keys-delay 0.5))
   #+end_src
 
+** restart-emacs
+
+  Setup the restart-emacs package and create useful functions fore reloading the config.
+
+  #+begin_src emacs-lisp
+    (use-package restart-emacs
+      :init 
+      (add-hook 'kill-emacs-hook (lambda ()
+                                   (interactive)
+                                   (shell-command
+                                    "rm ~/.emacs.d/emacs_config.el"))))
+
+  #+end_src
+  
 ** doom-theme
 
    #+begin_src emacs-lisp
@@ -274,12 +175,22 @@
    #+begin_src emacs-lisp
      (use-package evil-surround
        :config
-       (global-evil-surround-mode 1))
+       (global-evil-surround-mode 1)
+       ;; use non-spaced pairs when surrounding with an opening brace
+       (evil--add-to-alist
+        evil-surround-pairs-alist
+        ?\( '("(" . ")")
+        ?\[ '("[" . "]")
+        ?\{ '("{" . "}")
+        ?\) '("( " . " )")
+        ?\] '("[ " . " ]")
+        ?\} '("{ " . " }")))
+       
      (use-package evil-commentary
        :config
        (evil-commentary-mode))
 
-     ;; Restore redo functionality
+     ;; Resore redo functionality
      (use-package undo-tree
        :after evil
        :diminish     ; hides the mode from list of minor modes
@@ -461,6 +372,149 @@
          ("M-l" . windmove-right))))
    #+end_src
    
+* Modes
+  
+  #+begin_src emacs-lisp
+    (load "cook-mode.el")
+  #+end_src
+
+** C++ Mode
+
+   #+begin_src emacs-lisp
+     (setq c-default-style "bsd")
+     (setq-default indent-tabs-mode nil)
+     (setq indent-tabs-mode nil)
+     (setq-default c-basic-offset 4)
+     (c-set-offset 'innamespace 0)
+     ;; c++ mode for .h and .tcc files
+     (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
+     (add-to-list 'auto-mode-alist '("\\.tcc\\'" . c++-mode))
+   #+end_src
+   
+   #+begin_src emacs-lisp
+     (autoload 'glsl-mode "glsl-mode" nil t)
+     (add-to-list 'auto-mode-alist '("\\.frag\\'" . glsl-mode))
+     (add-to-list 'auto-mode-alist '("\\.vert\\'" . glsl-mode))
+   #+end_src
+
+** Org Mode
+   
+   General org-mode settings
+
+   #+begin_src emacs-lisp
+     (setq org-log-done 'time)
+     (setq calendar-week-start-day 1)
+   #+end_src
+   
+   When editing code blocks, the new buffer should open below the current one, without
+   modifying other windows.
+   
+   #+begin_src emacs-lisp
+     (setq org-src-window-setup 'split-window-below)
+   #+end_src
+
+   When hitting Alt-enter in a heading, the content of the current line should not be
+   moved to the new heading, and the new heading should be created below all the contents
+   of the current heading.
+
+   #+begin_src emacs-lisp
+     (setq org-M-RET-may-split-line nil)
+     (setq org-insert-heading-respect-content t)
+   #+end_src
+
+*** Agenda
+
+    Select which files to search for todos in.
+
+    #+begin_src emacs-lisp
+      (setq org-agenda-files (list "~/linuxconfig/.emacs.d/emacs-config.org"
+                                   "~/alice-emacs/emacs-guide.org"))
+    #+end_src
+
+** Text Mode
+
+   Breaks line at 90 characters.
+
+   #+begin_src emacs-lisp
+     (add-hook 'text-mode-hook #'auto-fill-mode)
+     (setq-default fill-column 90)
+   #+end_src
+   
+** LaTeX mode
+   
+   Basic settings for latex mode.
+
+   #+begin_src emacs-lisp
+     (add-to-list 'auto-mode-alist '("\\.tex\\'" . LaTeX-mode))
+
+     ;; Fungerar ej
+     ;; (add-to-list 'LaTeX-verbatim-environments "lstlisting")
+     ;; (setq LaTeX-indent-environment-list (cons '("lstlisting" current-indentation) (default-value 'LaTeX-indent-environment-list)))
+   #+end_src
+   
+*** Scripts
+   Small scripts for automating latex writing
+   
+   #+begin_src emacs-lisp
+
+     ;; Insert a beamer frame
+     (defun latex-frame ()
+       (interactive)
+       (insert "\\begin{frame}[fragile]{}\n\\end{frame}")
+       (evil-open-above 1))
+
+     ;; Insert an itemize list
+     (defun latex-itemize ()
+       (interactive)
+       (evil-insert 1)
+       (insert "\\begin{itemize}")
+       (indent-for-tab-command)
+       (newline)
+       (insert "\\item")
+       (indent-for-tab-command)
+       (newline)
+       (insert "\\end{itemize}")
+       (indent-for-tab-command)
+       (previous-line)
+       (end-of-line))
+
+     ;; Insert an lstlisting
+     (defun latex-lst ()
+       (interactive)
+       (evil-insert 1)
+       (insert "\\begin{lstlisting}[style=code, title=]")
+       (indent-for-tab-command)
+       (newline 2)
+       (insert "\\end{lstlisting}")
+       (indent-for-tab-command)
+       (previous-line)
+       (beginning-of-line))
+
+     (defun latex-columns ()
+       (interactive)
+       (evil-insert 1)
+       (insert "\\begin{columns}")
+       (indent-for-tab-command)
+       (newline)
+       (insert "\\begin{column}{0.5\\textwidth}")
+       (indent-for-tab-command)
+       (newline 2)
+       (insert "\\end{column}")
+       (indent-for-tab-command)
+       (newline)
+       (insert "\\begin{column}{0.5\\textwidth}")
+       (indent-for-tab-command)
+       (newline)
+       (insert "\\end{column}")
+       (indent-for-tab-command)
+       (newline)
+       (insert "\\end{columns}")
+       (indent-for-tab-command)
+       (previous-line 4)
+       (indent-for-tab-command)
+       (end-of-line))
+   #+end_src
+
 * Useful (built in) commands that would be easy to forget
 
 | ~C-c \vert~ | Create table in org mode                                    |
@@ -476,9 +530,6 @@
 ** TODO test out org-agenda. Might be nice along with all of these TODOs 
 ** DONE style mode line
    CLOSED: [2023-04-05 ons 13:58]
-   :LOGBOOK:
-   CLOCK: [2023-04-05 ons 14:02]--[2023-04-05 ons 14:02] =>  0:00
-   :END:
    
    Fixed by not fixing it. Its good as is. Maybe want to change appearence of the position thingy.
 
