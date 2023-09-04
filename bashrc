@@ -86,8 +86,5 @@ alias g++='g++ -std=c++20 -Wall -Wextra -Weffc++ -Wold-style-cast -Woverloaded-v
 alias gcc='gcc -Wall -Wextra -std=c99 -pedantic -g'
 alias make='make -j32'
 
-
-
-# Pintos stuff
-export PATH="${HOME}/pintos/src/utils/:${PATH}/"
-alias gcc='gcc -m32 -Wall -Wextra -std=c99 -pedantic -g'
+alias untar='tar xvf'
+alias tar='tar cvf'
