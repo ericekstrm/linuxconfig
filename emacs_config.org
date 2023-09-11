@@ -1,47 +1,84 @@
 * Basics
-  
-  #+begin_src emacs-lisp
 
+  Add an extra folder to the load path so that emacs has access to the files there. Put extra emacs
+  packages and el-files in there.
+
+  #+begin_src emacs-lisp
     (setq load-path (cons "~/linuxconfig/emacs-files" load-path))
+    (setq gc-cons-threshold (* 50 1000 1000))
   #+end_src
+
+** Basic setup
+
+   Configurations to remove all the extra stuff in default emacs. Disable menu bars and scrollbars,
+   enable winner-mode and save-place-mode, turn on relative line numbers.
   
-** Menubars and such
+   #+begin_src emacs-lisp
+     (setq inhibit-startup-screen t)            ; Disable startup screen
+     (menu-bar-mode -1)                         ; Disable menubar
+     (tool-bar-mode -1)                         ; Disable toolbar
+     (scroll-bar-mode -1)                       ; Disable visible scrollbar
+     (horizontal-scroll-bar-mode -1)            ; Disable visable scrollbar
+     (tooltip-mode 0)                           ; Disable tooltips
+     (setq use-system-tooltips 0)
+     (save-place-mode 1)                        ; Remember where in the file we were
+     (delete-selection-mode 1)                  ; Delete the selected text when pasting
+     (winner-mode 1)                            ; Remember window configurations
+     (setq ring-bell-function 'ignore)          ; Turn off the fucking sound 
+     (setq sentence-end-double-space nil)       ; Count one space after a period as the end of a sentence
+
+     (setq display-line-numbers-type 'relative) ; Use relative line numbers
+     (global-display-line-numbers-mode)         ; Always show line numbers
+     (setq-default display-line-numbers-width 3); Set width of line numbers to 3 characters
+
+     (setq-default fill-column 100)             ; Set the width of alt-q to 100 characters
+
+     (setq-default indent-tabs-mode nil)        ; Do NOT use tabs when indenting
+
+     (setq mouse-wheel-progressive-speed nil)   ; Disable scroll acceleration
+     (if (not (version< emacs-version "28"))    ; set scroll length.
+         (setq mouse-wheel-scroll-amount '(3, ((shift) . 1) ((control) . nil))))
+   #+end_src
+
+   Unsorted stuff
    
    #+begin_src emacs-lisp
-     (setq inhibit-startup-screen t) ; Disable startup screen
-     (menu-bar-mode -1)              ; Disable menubar
-     (tool-bar-mode -1)              ; Disable toolbar
-     (scroll-bar-mode -1)            ; Disable visible scrollbar
-     (horizontal-scroll-bar-mode -1) ; Disable visable scrollbar
-     (save-place-mode 1)             ; Remember where in the file we were
-     (delete-selection-mode 1)       ; Delete the selected text when pasting
-     (winner-mode 1)                 ; Remember window configurations (C-c left an'd C-c right to move between them)
-     (setq ring-bell-function 'ignore) ; Turn of the fucking sound 
-     (setq sentence-end-double-space nil)
+
+     (setq left-fringe-width 0) ;; remove pixels before line numbers on the left side. 
+
+     (font-lock-add-keywords    ;; add function calls to list of highlighted stuff
+      'cpp-mode
+      '(("\\<\\(\\sw+\\) ?(" 1 'font-lock-function-name-face)))
+
+     (load-theme 'my t) ;; Load my custom theme
+
+     (setq help-window-select t)
    #+end_src
 
-   Disable scroll acceleration
-
+   Handle the emacs instance.
+   
    #+begin_src emacs-lisp
-     (setq mouse-wheel-progressive-speed nil)
+     (defun reload-config()
+       (interactive)
+       (shell-command "rm ~/linuxconfig/emacs_config.el")
+       (restart-emacs))
+
+     (defun server-shutdown ()
+       "Save buffers, Quit, and Shutdown server"
+       (interactive)
+       (save-some-buffers)
+       (kill-emacs))
    #+end_src
 
-   Show matching parenthesis when selecting one.
-
-   #+begin_src emacs-lisp
-     (show-paren-mode 1)
-     (setq show-paren-delay 0)
-   #+end_src
-
-   Set unique buffer names for files with the same name
+   Set unique buffer names for files with the same name.
 
    #+begin_src emacs-lisp
      (require 'uniquify)
      (setq uniquify-buffer-name-style 'forward)
    #+end_src
 
-** Info
-   
+** User and machine info
+
    Record info about the current machine and user.
 
    #+begin_src emacs-lisp
@@ -49,7 +86,7 @@
      (setq my-email "ericekstrm@gmail.com")
      (setq my-machine-name (system-name))
    #+end_src
-   
+
    Set font size based on the current machine
 
    #+begin_src emacs-lisp
@@ -61,6 +98,20 @@
      (setq initial-frame-alist '((width . 110) (height . 60)))
    #+end_src
 
+** Profiling
+
+   #+begin_src emacs-lisp
+     ;; Use a hook so the message doesn't get clobbered by other messages.
+     (add-hook 'emacs-startup-hook
+               (lambda ()
+                 (message "Emacs ready in %s with %d garbage collections."
+                          (format "%.2f seconds"
+                                  (float-time
+                                   (time-subtract after-init-time before-init-time)))
+                          gcs-done)))
+
+   #+end_src
+   
 ** Backup files
 
    Move backup files out of the way, and extend the amount of backups created.
@@ -74,124 +125,96 @@
 	   backup-by-copying t)  ;; Copy all files, don't rename them
      (setq vc-make-backup-files t)
    #+end_src
-
-** Relative line numbers
-
-   Use relative line numbers in all modes.
    
-   #+begin_src emacs-lisp
-     (setq display-line-numbers-type 'relative)
-     (global-display-line-numbers-mode)
-   #+end_src
-
 * Packages
-  Setup to be able to use use-package
-  
+
+  Add the package archives and initialize use-package (only on older
+  emacs).
+
   #+begin_src emacs-lisp
-    (require 'package)
     (setq package-archives '(("melpa" . "https://melpa.org/packages/")
-			     ("org" . "https://orgmode.org/elpa")
-			     ("gnu" . "https://elpa.gnu.org/packages/")))
-    (package-initialize)
-    (unless package-archive-contents
-      (package-refresh-contents))               ; Need to run this manually if use-package is not working
-    (unless (package-installed-p 'use-package)
-      (package-install 'use-package))           ; Install use-package if not installed
-    (require 'use-package)
-    (setq use-package-always-ensure t)          ;
-    (setq use-package-compute-statistics t)     ; Profiler (get report with use-package-report)
+                             ("org" . "https://orgmode.org/elpa")
+                             ("gnu" . "https://elpa.gnu.org/packages/")))
+
+    (if (version< emacs-version "29.1")
+        (progn
+          (require 'package)
+          (package-initialize)
+          (unless package-archive-contents
+            (package-refresh-contents))               ; Need to run this manually if use-package is not working
+          (unless (package-installed-p 'use-package)
+            (package-install 'use-package))           ; Install use-package if not installed
+          (require 'use-package)))
   #+end_src
 
   Also set up the chords package so we can use it in use-package declarations
 
   #+begin_src emacs-lisp
     (use-package use-package-chords
+      :ensure t
       :config (key-chord-mode 1)
-      :custom (key-chord-two-keys-delay 0.5))
+      :custom
+      (key-chord-two-keys-delay 0.5)
+      (key-chord-safety-interval-forward 0.05))
   #+end_src
 
-** restart-emacs
-
-  Setup the restart-emacs package and create useful functions fore reloading the config.
-
-  #+begin_src emacs-lisp
-    (use-package restart-emacs
-      :init 
-      (add-hook 'kill-emacs-hook (lambda ()
-                                   (interactive)
-                                   (shell-command
-                                    "rm ~/.emacs.d/emacs_config.el"))))
-
-  #+end_src
-  
-** doom-theme
+** Doom-Themes
 
    #+begin_src emacs-lisp
      (use-package doom-themes
-       :config
-       (load-theme 'doom-gruvbox t))
+       :ensure t)
    #+end_src
-
-** evil
-
+   
+** Evil
+   
+   Evil mode.
+   
    #+begin_src emacs-lisp
      (use-package evil
+       :ensure t
        :init
        (evil-mode 1)
        :custom
        (evil-want-integration t)
-       (evil-want-keybinding nil)
+       (evil-want-keybinding nil)  ; Do not use evils default bindings for extra modes
+       (evil-move-cursor-back nil) ; Make 'ijj' not move the cursor back on character.
+       (evil-move-beyond-eol t)    ; allow the cursor to rest on the eol, as default emacs does.
+
        :chords (:map evil-insert-state-map
-                     ("jj" . evil-normal-state)))
+                     ("jj" . evil-normal-state)
+                     ("kk" . evil-normal-state))
+       :bind
+       ;; Restores tab functionality to normal and visual mode
+       (:map evil-normal-state-map
+             ("TAB" . indent-for-tab-command))
+       (:map evil-visual-state-map
+             ("TAB" . indent-for-tab-command))
+       )
    #+end_src
 
-   Add evil bindings for more modes.
+*** More settings
+   Add resonable evil bindings for more modes.
 
    #+begin_src emacs-lisp
      (use-package evil-collection
+       :ensure t
        :after evil
        :config
-       (evil-collection-init '(buff-menu company dired ediff ivy org)))
+       (evil-collection-init '(buff-menu ivy org)))
    #+end_src
 
-   Some more settings to restore common functionallity.
-
-   _ should be part of words in prog-mode, and ~TAB~ should still indent code correctly in most places.
+   '_' should be part of words in prog-mode.
 
    #+begin_src emacs-lisp
      ;; Adds '_' to be part of words in prog-mode
      (add-hook 'prog-mode-hook #'(lambda () (modify-syntax-entry ?_ "w")))
-     ;; Restores tab functionality to normal and visual mode
-     (define-key evil-normal-state-map (kbd "TAB") 'indent-for-tab-command)
-     (define-key evil-visual-state-map (kbd "TAB") 'indent-for-tab-command)
    #+end_src
 
-   Extra functionallity. 
-
-   Adds ~surround~ as a text object with ~s~. For example ~C s ( [~ to replace the surrounding parenthesis with square brackets
-
-   Adds command (~g c~) to comment out code.
-
+   Restore redo functionality
+   
    #+begin_src emacs-lisp
-     (use-package evil-surround
-       :config
-       (global-evil-surround-mode 1)
-       ;; use non-spaced pairs when surrounding with an opening brace
-       (evil--add-to-alist
-        evil-surround-pairs-alist
-        ?\( '("(" . ")")
-        ?\[ '("[" . "]")
-        ?\{ '("{" . "}")
-        ?\) '("( " . " )")
-        ?\] '("[ " . " ]")
-        ?\} '("{ " . " }")))
-       
-     (use-package evil-commentary
-       :config
-       (evil-commentary-mode))
-
-     ;; Resore redo functionality
      (use-package undo-tree
+       :ensure t
        :after evil
        :diminish     ; hides the mode from list of minor modes
        :config
@@ -200,94 +223,86 @@
        (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo-tree-files"))))
    #+end_src
    
+*** Extra commands
+    
+   Adds command ~g c~ to comment out code.
+
    #+begin_src emacs-lisp
-     (defun my-evil-paren-range (count beg end type inclusive)
-       "Get minimum range of paren text object.
-     COUNT, BEG, END, TYPE is used.  If INCLUSIVE is t, the text object is inclusive.
-     FN is function to get range."
-       (let* ((parens '("()" "[]" "{}" "<>" "\"\"" "''" "``"))
-              (pos (point))
-              c1
-              c2
-              range
-              found-range)
-         (dolist (p parens)
-           (condition-case nil
-               (let* ((c1 (aref p 0))
-                      (c2 (aref p 1)))
-                 (setq range (if (eq c1 c2) (evil-select-quote c1 beg end type count inclusive)
-                               (evil-select-paren c1 c2 beg end type count inclusive))))
-             (error nil))
-           (when (and range (<= (nth 0 range) pos) (< pos (nth 1 range)))
-             (cond
-              (found-range
-               (when (< (- (nth 1 range) (nth 0 range))
-                        (- (nth 1 found-range) (nth 0 found-range)))
-                 (setf (nth 0 found-range) (nth 0 range))
-                 (setf (nth 1 found-range) (nth 1 range))))
-              (t
-               (setq found-range range)))))
-         found-range))
+     (use-package evil-commentary
+       :ensure t
+       :after (evil)
+       :diminish ; Hide from list of minor modes
+       :config
+       (evil-commentary-mode))
+   #+end_src
 
-     (evil-define-text-object my-evil-a-paren (count &optional beg end type)
-       "Select a paren."
-       :extend-selection t
-       (my-evil-paren-range count beg end type t))
+   Adds ~surround~ as a text object with ~s~. For example ~c s ( [~ to replace the
+   surrounding parenthesis with square brackets
 
-     (evil-define-text-object my-evil-inner-paren (count &optional beg end type)
-       "Select 'inner' paren."
-       :extend-selection nil
-       (my-evil-paren-range count beg end type nil))
-
-     (define-key evil-inner-text-objects-map "g" #'my-evil-inner-paren)
-     (define-key evil-outer-text-objects-map "g" #'my-evil-a-paren)
+   #+begin_src emacs-lisp
+     (use-package evil-surround
+       :ensure t
+       :diminish ; Hide from list of minor modes
+       :config
+       (global-evil-surround-mode 1)
+       ;; Add to list of possible surrounding characters
+       ;; use non-spaced pairs when surrounding with an opening brace
+       (evil--add-to-alist
+        evil-surround-pairs-alist
+        ?\( '("(" . ")")
+        ?\) '("(" . ")")
+        ?\{ '("{" . "}")
+        ?\} '("{" . "}")
+        ?\[ '("[" . "]")
+        ?\] '("[" . "]")))
    #+end_src
    
-   #+begin_src emacs-lisp
+*** Extra text objects
 
-     (use-package evil-textobj-tree-sitter)
-     (use-package tree-sitter)
-     (use-package tree-sitter-langs)
+    Add function, class and argument as text objects. Can be used as ~daa~ to remove an
+    argument, or as ~cif~ to replace the contents of a function body.
+
+   #+begin_src emacs-lisp
+     (use-package evil-textobj-tree-sitter
+       :ensure t)
+     (use-package tree-sitter
+       :ensure t)
+     (use-package tree-sitter-langs
+       :ensure t)
 
      (global-tree-sitter-mode t)
 
      ;; bind `function.outer`(entire function block) to `f` for use in things like `vaf`, `yaf`
-     (define-key evil-outer-text-objects-map "f" (evil-textobj-tree-sitter-get-textobj "function.outer"))
      ;; bind `function.inner`(function block without name and args) to `f` for use in things like `vif`, `yif`
+
+     (define-key evil-outer-text-objects-map "f" (evil-textobj-tree-sitter-get-textobj "function.outer"))
      (define-key evil-inner-text-objects-map "f" (evil-textobj-tree-sitter-get-textobj "function.inner"))
 
-     ;; bind `function.outer`(entire function block) to `f` for use in things like `vaf`, `yaf`
      (define-key evil-outer-text-objects-map "c" (evil-textobj-tree-sitter-get-textobj "class.outer"))
-     ;; bind `function.inner`(function block without name and args) to `f` for use in things like `vif`, `yif`
      (define-key evil-inner-text-objects-map "c" (evil-textobj-tree-sitter-get-textobj "class.inner"))
 
-     ;; bind `function.outer`(entire function block) to `f` for use in things like `vaf`, `yaf`
      (define-key evil-outer-text-objects-map "a" (evil-textobj-tree-sitter-get-textobj "parameter.outer"))
-     ;; bind `function.inner`(function block without name and args) to `f` for use in things like `vif`, `yif`
      (define-key evil-inner-text-objects-map "a" (evil-textobj-tree-sitter-get-textobj "parameter.inner"))
-
-
-
    #+end_src
    
-** ivy, counsel, swiper
+** Ivy
 
-   Better autocomplete in minibuffers
+   Better autocomplete in minibuffers.
 
    #+begin_src emacs-lisp
      (use-package ivy
+       :ensure t
        :init
        (ivy-mode 1)
        :bind (:map ivy-minibuffer-map
-              ("TAB" . ivy-alt-done)
-              ("RET" . ivy-alt-done)
-              ("C-k" . ivy-previous-line)
-              ("C-j" . ivy-next-line)
-              :map ivy-switch-buffer-map
-              ("C-k" . ivy-previous-line)
-              ("C-j" . ivy-next-line))
+		   ("TAB" . ivy-alt-done)
+		   ("RET" . ivy-alt-done)
+		   ("C-k" . ivy-previous-line)
+		   ("C-j" . ivy-next-line)
+		   :map ivy-switch-buffer-map
+		   ("C-k" . ivy-previous-line)
+		   ("C-j" . ivy-next-line))
        :custom
-       (ivy-use-virtual-buffers t)                                ; add recent files to list of buffers
        (ivy-initial-inputs-alist nil)                             ; remove the '^' as inital char in buffer
        (ivy-re-builders-alist '((t . ivy--regex-ignore-order))))  ; add some flexibility to ivy search
    #+end_src
@@ -296,75 +311,77 @@
 
    #+begin_src emacs-lisp
      (use-package counsel
+       :ensure t
        :after ivy
        :config
        (counsel-mode))
    #+end_src
 
-   Adds more info to some ivy-buffers.
-
-   #+begin_src emacs-lisp
-     (use-package ivy-rich
-       :config
-       (ivy-rich-set-columns 'ivy-switch-buffer
-                             '((ivy-switch-buffer-transformer (:width 0.35))))
-       (ivy-rich-mode 1))
-   #+end_src
-
-   TODO: Does not show anything in the switch-bufer minibuffer now
-
    Swiper uses ivy for searching in files
 
    #+begin_src emacs-lisp
      (use-package swiper
+       :ensure t
        :after ivy
        :bind (("C-s" . swiper)))
    #+end_src
 
-** telephone line
+   Add more info to some ivy-buffers.
+   
+   #+begin_src emacs-lisp
+     (use-package ivy-rich
+       :ensure t
+       :config
+       ;; Nothing fancy in switch-buffer list. 
+       (ivy-rich-set-columns 'ivy-switch-buffer
+                             '((ivy-switch-buffer-transformer (:width 0.35))))
+       (ivy-rich-mode 1))
+   #+end_src
+   
+** LSP-mode
 
-   Set a cool mode line style.
-   [[https://github.com/dbordak/telephone-line][telephone-line]]
+   Language server protocol.
+
+   #+begin_src emacs-lisp
+     (use-package lsp-mode
+       :ensure t
+       :hook
+       (c++-mode . lsp-deferred)
+       (c-mode . lsp-deferred)
+       :commands (lsp lsp-deferred)
+       :custom
+       (lsp-enable-on-type-formatting nil)
+       (lsp-headerline-breadcrumb-enable nil)
+       (lsp-diagnostics-provider :none)
+       (lsp-eldoc-enable-hover nil)
+       :bind ((:map evil-normal-state-map
+                    ("gi" . lsp-find-definition)
+                    ("gd" . lsp-find-declaration)
+                    ("gb" . evil-jump-backward))))
+
+
+
+   #+end_src
+   
+** Telephone line
+
+   Set a nice mode line style. [[https://github.com/dbordak/telephone-line][telephone-line]]
 
    #+begin_src emacs-lisp 
-     (use-package telephone-line)
-     (telephone-line-mode 1)
-   #+end_src
-
-** treemacs
-
-   #+begin_src emacs-lisp
-
-     (use-package treemacs
+     (use-package telephone-line
+       :ensure t
        :config
-       (progn
-         (setq treemacs-collapse-dirs    2    ; collapses this number of directories if they only contain another directory.
-               treemacs-file-event-delay 2000 ; time in miliseconds before updating files
-               treemacs-indentation      2    ; indentation levels
-               treemacs-width            35   ; width of the treemacs window
-               treemacs-silent-refresh   t    ; no log message when refreshing
-               treemacs-silent-filewatch t    ; no log message then refreching files
-               treemacs-tag-follow-delay 0.2) ; 
-         (treemacs-follow-mode t)
-         (treemacs-filewatch-mode t))
-       :bind
-       (:map treemacs-mode-map
-             ("a" . treemacs-add-project-to-workspace)
-             ("d" . treemacs-remove-project-from-workspace)
-             ("M-l" . windmove-right)
-             ("i" . treemacs-previous-line)
-             ("k" . treemacs-next-line)
-             ("l" . treemacs-RET-action)
-             ("h" . treemacs-COLLAPSE-action)))
-     (global-set-key [f8] 'treemacs)
+       (telephone-line-mode 1))
    #+end_src
 
-** windmove
+** Windmove
 
-   Keybindings to move between buffers
+   Keybindings for moving between open windows.
 
    #+begin_src emacs-lisp
+
      (use-package windmove
+       :ensure t
        :bind
        ((("M-j" . windmove-down)
          ("M-k" . windmove-up)
@@ -373,17 +390,14 @@
    #+end_src
    
 * Modes
-  
-  #+begin_src emacs-lisp
-    (load "cook-mode.el")
-  #+end_src
-
-** C++ Mode
+** Cook Mode
 
    #+begin_src emacs-lisp
+     (load "cook-mode.el")
+   #+end_src
+** C++ Mode
+   #+begin_src emacs-lisp
      (setq c-default-style "bsd")
-     (setq-default indent-tabs-mode nil)
-     (setq indent-tabs-mode nil)
      (setq-default c-basic-offset 4)
      (c-set-offset 'innamespace 0)
      ;; c++ mode for .h and .tcc files
@@ -396,133 +410,109 @@
      (add-to-list 'auto-mode-alist '("\\.frag\\'" . glsl-mode))
      (add-to-list 'auto-mode-alist '("\\.vert\\'" . glsl-mode))
    #+end_src
+** Latex Mode
+   Basic settings for latex.
 
+   #+begin_src emacs-lisp
+     ;; set the correct latex mode for tex files.
+     (add-to-list 'auto-mode-alist '("\\.tex\\'" . LaTeX-mode))
+   #+end_src
+*** Scripts
+
+    Create commands to do the most common latex things that usually take a lot of time.
+
+    #+begin_src emacs-lisp
+      ;; Insert a beamer frame
+      (defun latex-frame ()
+        (interactive)
+        (insert "\\begin{frame}[fragile, t]{")
+        (save-excursion
+          (insert "}\n\n\\end{frame}"))
+        (evil-insert 1))
+
+      ;; Insert an itemize list
+      (defun latex-itemize ()
+        (interactive)
+        (insert "\\begin{itemize}\n\\item ")
+        (save-excursion
+          (insert "\n\\end{itemize}"))
+        (evil-insert 1)
+        (indent-for-tab-command))
+
+      ;; Insert an lstlisting
+      (defun latex-lst ()
+        (interactive)
+        (insert "\\begin{lstlisting}[style=code, gobble=4]\n")
+        (save-excursion
+          (insert "\n\\end{lstlsting}"))
+        (evil-insert 1)
+        (indent-for-tab-command))
+
+      ;; Insert beamer columns
+      (defun latex-columns ()
+        (interactive)
+        (insert "\\begin{columns}\n\\begin{column}{0.5\\textwidth}\n")
+        (save-excursion
+          (insert "\n\\end{column}\n\\end{columns}"))
+        (evil-insert 1)
+        (indent-for-tab-command))
+    #+end_src
+    
 ** Org Mode
    
    General org-mode settings
 
    #+begin_src emacs-lisp
-     (setq org-log-done 'time)
-     (setq calendar-week-start-day 1)
+     (setq org-log-done 'time)        ; Add 'closed' time to completed TODOs
+     (setq calendar-week-start-day 1) ; Week starts on mondays
    #+end_src
    
-   When editing code blocks, the new buffer should open below the current one, without
-   modifying other windows.
+   When editing code blocks, the new buffer should be created as a split in the current window.
    
-   #+begin_src emacs-lisp
+   #+BEGIN_src emacs-lisp
      (setq org-src-window-setup 'split-window-below)
    #+end_src
 
-   When hitting Alt-enter in a heading, the content of the current line should not be
-   moved to the new heading, and the new heading should be created below all the contents
-   of the current heading.
+   When hitting Alt-enter in a heading, the content of the current line should not be moved to the
+   new heading, and the new heading should be created below all the contents of the current heading.
 
    #+begin_src emacs-lisp
      (setq org-M-RET-may-split-line nil)
      (setq org-insert-heading-respect-content t)
    #+end_src
 
-*** Agenda
-
-    Select which files to search for todos in.
-
-    #+begin_src emacs-lisp
-      (setq org-agenda-files (list "~/linuxconfig/.emacs.d/emacs-config.org"
-                                   "~/alice-emacs/emacs-guide.org"))
-    #+end_src
-
+   Indent contents in headings
+   
+   #+begin_src emacs-lisp
+     (setq org-adapt-indentation t)
+   #+end_src
+   
 ** Text Mode
 
-   Breaks line at 90 characters.
+   Breaks line at 100 characters.
 
    #+begin_src emacs-lisp
      (add-hook 'text-mode-hook #'auto-fill-mode)
-     (setq-default fill-column 90)
-   #+end_src
-   
-** LaTeX mode
-   
-   Basic settings for latex mode.
-
-   #+begin_src emacs-lisp
-     (add-to-list 'auto-mode-alist '("\\.tex\\'" . LaTeX-mode))
-
-     ;; Fungerar ej
-     ;; (add-to-list 'LaTeX-verbatim-environments "lstlisting")
-     ;; (setq LaTeX-indent-environment-list (cons '("lstlisting" current-indentation) (default-value 'LaTeX-indent-environment-list)))
-   #+end_src
-   
-*** Scripts
-   Small scripts for automating latex writing
-   
-   #+begin_src emacs-lisp
-
-     ;; Insert a beamer frame
-     (defun latex-frame ()
-       (interactive)
-       (insert "\\begin{frame}[fragile]{}\n\\end{frame}")
-       (evil-open-above 1))
-
-     ;; Insert an itemize list
-     (defun latex-itemize ()
-       (interactive)
-       (evil-insert 1)
-       (insert "\\begin{itemize}")
-       (indent-for-tab-command)
-       (newline)
-       (insert "\\item")
-       (indent-for-tab-command)
-       (newline)
-       (insert "\\end{itemize}")
-       (indent-for-tab-command)
-       (previous-line)
-       (end-of-line))
-
-     ;; Insert an lstlisting
-     (defun latex-lst ()
-       (interactive)
-       (evil-insert 1)
-       (insert "\\begin{lstlisting}[style=code, title=]")
-       (indent-for-tab-command)
-       (newline 2)
-       (insert "\\end{lstlisting}")
-       (indent-for-tab-command)
-       (previous-line)
-       (beginning-of-line))
-
-     (defun latex-columns ()
-       (interactive)
-       (evil-insert 1)
-       (insert "\\begin{columns}")
-       (indent-for-tab-command)
-       (newline)
-       (insert "\\begin{column}{0.5\\textwidth}")
-       (indent-for-tab-command)
-       (newline 2)
-       (insert "\\end{column}")
-       (indent-for-tab-command)
-       (newline)
-       (insert "\\begin{column}{0.5\\textwidth}")
-       (indent-for-tab-command)
-       (newline)
-       (insert "\\end{column}")
-       (indent-for-tab-command)
-       (newline)
-       (insert "\\end{columns}")
-       (indent-for-tab-command)
-       (previous-line 4)
-       (indent-for-tab-command)
-       (end-of-line))
+     (setq-default fill-column 100)
    #+end_src
 
+* Cleanup
+
+  Clean up after the init process. 
+  
+  #+begin_src emacs-lisp
+    (setq gc-cons-threshold (* 2 1000 1000))   ;; Reset garbage collection threshold
+
+  #+end_src
+  
 * Useful (built in) commands that would be easy to forget
 
-| ~C-c \vert~ | Create table in org mode                                    |
-| ~C-c '~     | open (and close) new buffer to edit inline-code in org mode |
-| ~C-c left~  | Move to previous window configuration                       |
-| ~C-c right~ | Move the the next window configuration                      |
+  | ~C-c \vert~ | Create table in org mode                                    |
+  | ~C-c '~     | open (and close) new buffer to edit inline-code in org mode |
+  | ~C-c left~  | Move to previous window configuration                       |
+  | ~C-c right~ | Move the the next window configuration                      |
 
-* Stuff to do [16%]
+* Stuff to do [12%]
 ** TODO check out Magit (for real)
 ** TODO check out the emacs package Projectile
 ** TODO Hydra för att skapa tangentbordkombinationer med en gemensam startknapp?
@@ -552,3 +542,15 @@
    ;;        mode-line-modes
    ;;        mode-line-misc-info
    ;;        mode-line-end-spaces))
+
+** TODO config indentation for latex command
+
+   The latex command will not be indented correctly now.
+
+   Ide: use (set-mark) and (indent-region).
+
+** TODO Evil 'b' command?
+
+   http://blog.binchen.org/posts/code-faster-by-extending-emacs-evil-text-object/
+
+** TODO lsp/clangd cant find implementation???
