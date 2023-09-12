@@ -4,6 +4,7 @@
   packages and el-files in there.
 
   #+begin_src emacs-lisp
+    (add-to-list 'custom-theme-load-path "~/linuxconfig")
     (setq load-path (cons "~/linuxconfig/emacs-files" load-path))
     (setq gc-cons-threshold (* 50 1000 1000))
   #+end_src
