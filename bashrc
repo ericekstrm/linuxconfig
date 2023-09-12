@@ -86,5 +86,5 @@ alias g++='g++ -std=c++20 -Wall -Wextra -Weffc++ -Wold-style-cast -Woverloaded-v
 alias gcc='gcc -Wall -Wextra -std=c99 -pedantic -g'
 alias make='make -j32'
 
-alias untar='tar xvf'
-alias tar='tar cvf'
+alias untar='\tar -xf'
+alias tar='\tar -cf'
