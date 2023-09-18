@@ -8,6 +8,28 @@
     (setq load-path (cons "~/linuxconfig/emacs-files" load-path))
     (setq gc-cons-threshold (* 50 1000 1000))
   #+end_src
+** elisp functions
+
+   Some useful elisp functions and stuff.
+   
+   #+begin_src emacs-lisp
+     ;; check emacs versions
+
+     (defun emacs-version< (val1)
+       (version< emacs-version val1))
+
+     (defun emacs-version<= (val1)
+       (version<= emacs-version val1))
+
+     (defun emacs-version= (val1)
+       (version= emacs-version val1))
+
+     (defun emacs-version> (val1)
+       (not (emacs-version<= val1)))
+
+     (defun emacs-version>= (val1)
+       (not (emacs-version< val1)))
+   #+end_src
 
 ** Basic setup
 
@@ -27,6 +49,7 @@
      (winner-mode 1)                            ; Remember window configurations
      (setq ring-bell-function 'ignore)          ; Turn off the fucking sound 
      (setq sentence-end-double-space nil)       ; Count one space after a period as the end of a sentence
+     (show-paren-mode 1)                        ; Show matching partentheses (needed on 26.3)
 
      (setq display-line-numbers-type 'relative) ; Use relative line numbers
      (global-display-line-numbers-mode)         ; Always show line numbers
@@ -37,7 +60,7 @@
      (setq-default indent-tabs-mode nil)        ; Do NOT use tabs when indenting
 
      (setq mouse-wheel-progressive-speed nil)   ; Disable scroll acceleration
-     (if (not (version< emacs-version "28"))    ; set scroll length.
+     (if (emacs-version> "28")                  ; set scroll length.
          (setq mouse-wheel-scroll-amount '(3, ((shift) . 1) ((control) . nil))))
    #+end_src
 
@@ -137,7 +160,7 @@
                              ("org" . "https://orgmode.org/elpa")
                              ("gnu" . "https://elpa.gnu.org/packages/")))
 
-    (if (version< emacs-version "29.1")
+    (if (emacs-version< "29.1")
         (progn
           (require 'package)
           (package-initialize)
@@ -260,30 +283,33 @@
    
 *** Extra text objects
 
-    Add function, class and argument as text objects. Can be used as ~daa~ to remove an
+    Add function, class and argument as text objects. Can for example be used as ~daa~ to remove an
     argument, or as ~cif~ to replace the contents of a function body.
 
    #+begin_src emacs-lisp
-     (use-package evil-textobj-tree-sitter
-       :ensure t)
-     (use-package tree-sitter
-       :ensure t)
-     (use-package tree-sitter-langs
-       :ensure t)
+     (if (emacs-version>= "29.1")
+         (progn
+           (use-package tree-sitter
+             :ensure t)
+           (use-package evil-textobj-tree-sitter
+             :ensure t)
+           (use-package tree-sitter-langs
+             :ensure t)
 
-     (global-tree-sitter-mode t)
+           (global-tree-sitter-mode t)
 
-     ;; bind `function.outer`(entire function block) to `f` for use in things like `vaf`, `yaf`
-     ;; bind `function.inner`(function block without name and args) to `f` for use in things like `vif`, `yif`
+           ;; bind `function.outer`(entire function block) to `f` for use in things like `vaf`, `yaf`
+           ;; bind `function.inner`(function block without name and args) to `f` for use in things like `vif`, `yif`
 
-     (define-key evil-outer-text-objects-map "f" (evil-textobj-tree-sitter-get-textobj "function.outer"))
-     (define-key evil-inner-text-objects-map "f" (evil-textobj-tree-sitter-get-textobj "function.inner"))
+           (define-key evil-outer-text-objects-map "f" (evil-textobj-tree-sitter-get-textobj "function.outer"))
+           (define-key evil-inner-text-objects-map "f" (evil-textobj-tree-sitter-get-textobj "function.inner"))
 
-     (define-key evil-outer-text-objects-map "c" (evil-textobj-tree-sitter-get-textobj "class.outer"))
-     (define-key evil-inner-text-objects-map "c" (evil-textobj-tree-sitter-get-textobj "class.inner"))
+           (define-key evil-outer-text-objects-map "c" (evil-textobj-tree-sitter-get-textobj "class.outer"))
+           (define-key evil-inner-text-objects-map "c" (evil-textobj-tree-sitter-get-textobj "class.inner"))
 
-     (define-key evil-outer-text-objects-map "a" (evil-textobj-tree-sitter-get-textobj "parameter.outer"))
-     (define-key evil-inner-text-objects-map "a" (evil-textobj-tree-sitter-get-textobj "parameter.inner"))
+           (define-key evil-outer-text-objects-map "a" (evil-textobj-tree-sitter-get-textobj "parameter.outer"))
+           (define-key evil-inner-text-objects-map "a" (evil-textobj-tree-sitter-get-textobj "parameter.inner"))
+           ))
    #+end_src
    
 ** Ivy
@@ -344,22 +370,24 @@
    Language server protocol.
 
    #+begin_src emacs-lisp
-     (use-package lsp-mode
-       :ensure t
-       :hook
-       (c++-mode . lsp-deferred)
-       (c-mode . lsp-deferred)
-       :commands (lsp lsp-deferred)
-       :custom
-       (lsp-enable-on-type-formatting nil)
-       (lsp-headerline-breadcrumb-enable nil)
-       (lsp-diagnostics-provider :none)
-       (lsp-eldoc-enable-hover nil)
-       :bind ((:map evil-normal-state-map
-                    ("gi" . lsp-find-definition)
-                    ("gd" . lsp-find-declaration)
-                    ("gb" . evil-jump-backward))))
-
+     (if (emacs-version>= "29.1")
+         (use-package lsp-mode
+           :ensure t
+           :hook
+           (c++-mode . lsp-deferred)
+           (c-mode . lsp-deferred)
+           :commands (lsp lsp-deferred)
+           :custom
+           (lsp-enable-on-type-formatting nil)
+           (lsp-headerline-breadcrumb-enable nil)
+           (lsp-diagnostics-provider :none)
+           (lsp-eldoc-enable-hover nil)
+           :bind ((:map evil-normal-state-map
+                        ("gi" . lsp-find-definition)
+                        ("gd" . lsp-find-declaration)
+                        ("gb" . evil-jump-backward))))
+       )
+  
 
 
    #+end_src
@@ -471,7 +499,7 @@
    When editing code blocks, the new buffer should be created as a split in the current window.
    
    #+BEGIN_src emacs-lisp
-     (setq org-src-window-setup 'split-window-below)
+     (setq org-src-window-setup 'split-window-below)   ; Does not work in 26.3
    #+end_src
 
    When hitting Alt-enter in a heading, the content of the current line should not be moved to the
@@ -555,3 +583,5 @@
    http://blog.binchen.org/posts/code-faster-by-extending-emacs-evil-text-object/
 
 ** TODO lsp/clangd cant find implementation???
+** TODO change color of matching paren to cursor color
+** TODO move 'uniquify' to use-package?

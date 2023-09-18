@@ -82,12 +82,23 @@ alias ..='cd ..'
 export EDITOR=emacs
 alias getlab='~/upp/getlab-cli/staff_cli.py'
 
-alias g++='g++ -std=c++20 -Wall -Wextra -Weffc++ -Wold-style-cast -Woverloaded-virtual -pedantic -g'
-alias gcc='gcc -Wall -Wextra -std=c99 -pedantic -g'
+# Christoffers mega-hack för att hitta senaste g++-versionen på systemet.
+compiler=$(for i in $(find ${PATH//:/ } -name "g++*" 2>/dev/null); do echo $($i --version | grep -oe "[0-9]\+\\.[0-9]\+\\.[0-9]\+" | head -1) $i; done | sort -n | tail -1 | cut -d' ' -f2)
+compiler_version=$($compiler --version | grep -oe "[0-9]\+\\.[0-9]\+\\.[0-9]\+" | head -1)
+
+
+if [ $(echo $compiler_version | cut -f1 -d.) -ge 10 ];
+then
+   alias g++='$compiler -std=c++20 -Wall -Wextra -Weffc++ -Wold-style-cast -Woverloaded-virtual -pedantic -g'
+else
+   alias g++='$compiler -std=c++2a -Wall -Wextra -Weffc++ -Wold-style-cast -Woverloaded-virtual -pedantic -g'
+fi
+
+#alias g++='g++ -std=c++20 -Wall -Wextra -Weffc++ -Wold-style-cast -Woverloaded-virtual -pedantic -g'
+#alias gcc='gcc -Wall -Wextra -std=c99 -pedantic -g'
 alias make='make -j32'
 
 
-
 # Pintos stuff
-export PATH="${HOME}/pintos/src/utils/:${PATH}/"
-alias gcc='gcc -m32 -Wall -Wextra -std=c99 -pedantic -g'
+#export PATH="${HOME}/pintos/src/utils/:${PATH}/"
+#alias gcc='gcc -m32 -Wall -Wextra -std=c99 -pedantic -g'
