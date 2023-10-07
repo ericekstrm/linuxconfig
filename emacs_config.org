@@ -438,7 +438,7 @@
      (load "cmake-mode.el")
    #+end_src
 
-     ,#+begin_src emacs-lisp
+   #+begin_src emacs-lisp
        (autoload 'glsl-mode "glsl-mode" nil t)
        (add-to-list 'auto-mode-alist '("\\.frag\\'" . glsl-mode))
        (add-to-list 'auto-mode-alist '("\\.vert\\'" . glsl-mode))
