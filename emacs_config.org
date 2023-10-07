@@ -405,11 +405,15 @@
      (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
      (add-to-list 'auto-mode-alist '("\\.tcc\\'" . c++-mode))
    #+end_src
-   
+
    #+begin_src emacs-lisp
-     (autoload 'glsl-mode "glsl-mode" nil t)
-     (add-to-list 'auto-mode-alist '("\\.frag\\'" . glsl-mode))
-     (add-to-list 'auto-mode-alist '("\\.vert\\'" . glsl-mode))
+     (load "cmake-mode.el")
+   #+end_src
+
+     ,#+begin_src emacs-lisp
+       (autoload 'glsl-mode "glsl-mode" nil t)
+       (add-to-list 'auto-mode-alist '("\\.frag\\'" . glsl-mode))
+       (add-to-list 'auto-mode-alist '("\\.vert\\'" . glsl-mode))
    #+end_src
 ** Latex Mode
    Basic settings for latex.
