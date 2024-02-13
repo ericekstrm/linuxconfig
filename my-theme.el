@@ -117,6 +117,8 @@
     :background base1)
    (org-block
     :background base2)
+   (org-level-3
+    :foreground green)
 
    ;; ;;;; ivy
    ;; (ivy-current-match

@@ -13,8 +13,8 @@
    Some useful elisp functions and stuff.
    
    #+begin_src emacs-lisp
-     ;; check emacs versions
 
+     ;; check emacs versions
      (defun emacs-version< (val1)
        (version< emacs-version val1))
 
@@ -116,7 +116,7 @@
    #+begin_src emacs-lisp
      (set-face-attribute 'default nil :height 90)
      (pcase my-machine-name
-       ("kit" (set-face-attribute 'default nil :height 130))
+       ("kit" (set-face-attribute 'default nil :height 110))
        ("kube" (set-face-attribute 'default nil :height 90)))
      ;; Set initial window size
      (setq initial-frame-alist '((width . 110) (height . 60)))
@@ -477,16 +477,16 @@
         (interactive)
         (insert "\\begin{lstlisting}[style=code, gobble=4]\n")
         (save-excursion
-          (insert "\n\\end{lstlsting}"))
+          (insert "\n\\end{lstlisting}"))
         (evil-insert 1)
         (indent-for-tab-command))
 
       ;; Insert beamer columns
       (defun latex-columns ()
         (interactive)
-        (insert "\\begin{columns}\n\\begin{column}{0.5\\textwidth}\n")
+        (insert "\\begin{columns}\n\\column{0.5\\textwidth}\n")
         (save-excursion
-          (insert "\n\\end{column}\n\\end{columns}"))
+          (insert "\n\\column{0.5\\textwidth}\n\\end{columns}"))
         (evil-insert 1)
         (indent-for-tab-command))
     #+end_src
