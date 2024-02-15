@@ -4,8 +4,8 @@
   packages and el-files in there.
 
   #+begin_src emacs-lisp
-    (add-to-list 'custom-theme-load-path "~/linuxconfig")
-    (setq load-path (cons "~/linuxconfig/emacs-files" load-path))
+    (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
+    (setq load-path (cons "~/.emacs.d/extra-modes" load-path))
     (setq gc-cons-threshold (* 50 1000 1000))
   #+end_src
 ** elisp functions
@@ -84,7 +84,7 @@
    #+begin_src emacs-lisp
      (defun reload-config()
        (interactive)
-       (shell-command "rm ~/linuxconfig/emacs_config.el")
+       (shell-command "rm ~/.emacs.d/config.el")
        (restart-emacs))
 
      (defun server-shutdown ()
@@ -545,7 +545,7 @@
   | ~C-c left~  | Move to previous window configuration                       |
   | ~C-c right~ | Move the the next window configuration                      |
 
-* Stuff to do [12%]
+* Stuff to do [8%]
 ** TODO check out Magit (for real)
 ** TODO check out the emacs package Projectile
 ** TODO Hydra för att skapa tangentbordkombinationer med en gemensam startknapp?
@@ -589,3 +589,7 @@
 ** TODO lsp/clangd cant find implementation???
 ** TODO change color of matching paren to cursor color
 ** TODO move 'uniquify' to use-package?
+** TODO Fixa spell-check
+
+   https://www.emacswiki.org/emacs/FlySpell
+   https://stackoverflow.com/questions/27544869/how-do-i-change-ispell-private-dictionary

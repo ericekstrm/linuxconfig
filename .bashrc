@@ -25,14 +25,15 @@ PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[0
 
 # Emacs
 export EDITOR=emacs
-alias e=emacs
+alias e='emacs'
 # alias emacs='emacsclient -nc -a=""'
 
 # ls variants
-alias ll='ls -alFh'
-alias sl="ls"
-alias l="ls"
-alias s="ls"
+alias ls='ls --color=auto'
+alias ll='ls -alh'
+alias sl='ls'
+alias l='ls'
+alias s='ls'
 alias ..='cd ..'
 # Getlab
 alias getlab='~/upp/getlab-cli/staff_cli.py'
