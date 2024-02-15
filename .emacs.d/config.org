@@ -74,8 +74,6 @@
       'cpp-mode
       '(("\\<\\(\\sw+\\) ?(" 1 'font-lock-function-name-face)))
 
-     (load-theme 'my t) ;; Load my custom theme
-
      (setq help-window-select t)
    #+end_src
 
@@ -187,6 +185,7 @@
    #+begin_src emacs-lisp
      (use-package doom-themes
        :ensure t)
+     (load-theme 'my t) ;; Load my custom theme
    #+end_src
    
 ** Evil
