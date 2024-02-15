@@ -3,4 +3,5 @@
 *~
 *#
 
-emacs_config.el
+.emacs.d/config.el
+.emacs.d/backup-files/
