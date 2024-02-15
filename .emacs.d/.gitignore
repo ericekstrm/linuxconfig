@@ -1,0 +1,6 @@
+eln-cache/
+elpa/
+places
+transient/
+backup-files/
+config.el
