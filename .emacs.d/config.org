@@ -64,6 +64,13 @@
          (setq mouse-wheel-scroll-amount '(3, ((shift) . 1) ((control) . nil))))
    #+end_src
 
+   Fix scratch buffer
+   
+   #+begin_src emacs-lisp
+     (setq initial-major-mode 'org-mode)
+     (setq initial-scratch-message "")
+   #+end_src
+
    Unsorted stuff
    
    #+begin_src emacs-lisp
