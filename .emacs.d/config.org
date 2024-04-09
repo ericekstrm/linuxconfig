@@ -187,6 +187,25 @@
       (key-chord-safety-interval-forward 0.05))
   #+end_src
 
+** Buffer Stack
+
+  #+begin_src emacs-lisp
+    (use-package buffer-flip
+      :ensure t
+      :bind  (("C-<tab>" . buffer-flip)
+              :map buffer-flip-map
+              ( "C-<tab>" .   buffer-flip-forward) 
+              ( "C-S-<tab>" . buffer-flip-backward) 
+              ( "C-ESC" .     buffer-flip-abort))
+      :custom
+      (buffer-flip-skip-patterns '("^\\*.*\\*$")))
+      ;; :config
+      ;; (setq buffer-flip-skip-patterns
+      ;;       '("^\\*helm\\b"
+      ;;         "^\\*swiper\\*$")))
+  #+end_src
+   
+   
 ** Doom-Themes
 
    #+begin_src emacs-lisp
