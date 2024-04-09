@@ -75,9 +75,9 @@
    
    #+begin_src emacs-lisp
 
-     (setq left-fringe-width 0) ;; remove pixels before line numbers on the left side. 
+     (setq left-fringe-width 0) ; remove pixels before line numbers on the left side. 
 
-     (font-lock-add-keywords    ;; add function calls to list of highlighted stuff
+     (font-lock-add-keywords    ; add function calls to list of highlighted stuff
       'cpp-mode
       '(("\\<\\(\\sw+\\) ?(" 1 'font-lock-function-name-face)))
 
@@ -147,11 +147,11 @@
 
    #+begin_src emacs-lisp
      (setq backup-directory-alist `(("." . "~/.emacs.d/backup-files")))
-     (setq version-control t     ;; Use version numbers for backups.
-	   kept-new-versions 10  ;; Number of newest versions to keep.
-	   kept-old-versions 0   ;; Number of oldest versions to keep.
-	   delete-old-versions t ;; Don't ask to delete excess backup versions.
-	   backup-by-copying t)  ;; Copy all files, don't rename them
+     (setq version-control t     ; Use version numbers for backups.
+	   kept-new-versions 10  ; Number of newest versions to keep.
+	   kept-old-versions 0   ; Number of oldest versions to keep.
+	   delete-old-versions t ; Don't ask to delete excess backup versions.
+	   backup-by-copying t)  ; Copy all files, don't rename them
      (setq vc-make-backup-files t)
    #+end_src
    
@@ -204,7 +204,6 @@
       ;;       '("^\\*helm\\b"
       ;;         "^\\*swiper\\*$")))
   #+end_src
-   
    
 ** Doom-Themes
 
@@ -285,7 +284,7 @@
    
 *** Extra commands
     
-   Adds command ~g c~ to comment out code.
+   Adds command ~gc~ to comment out code.
 
    #+begin_src emacs-lisp
      (use-package evil-commentary
@@ -296,9 +295,9 @@
        (evil-commentary-mode))
    #+end_src
 
-   Adds ~surround~ as a text object with ~s~. For example ~c s ( [~ to replace the
+   Adds ~surround~ as a text object with ~s~. For example ~cs([~ to replace the
    surrounding parenthesis with square brackets
-
+   
    #+begin_src emacs-lisp
      (use-package evil-surround
        :ensure t
@@ -315,6 +314,16 @@
         ?\} '("{" . "}")
         ?\[ '("[" . "]")
         ?\] '("[" . "]")))
+   #+end_src
+   
+   Adds command to align text based on a character with ~gl~. For example ~glip=~ to align all lines
+   in a paragraph on the equal sign.
+
+   #+begin_src emacs-lisp
+     (use-package evil-lion
+       :ensure t
+       :config
+       (evil-lion-mode))
    #+end_src
    
 *** Extra text objects
@@ -571,7 +580,7 @@
   Clean up after the init process. 
   
   #+begin_src emacs-lisp
-    (setq gc-cons-threshold (* 2 1000 1000))   ;; Reset garbage collection threshold
+    (setq gc-cons-threshold (* 2 1000 1000))   ; Reset garbage collection threshold
 
   #+end_src
   
