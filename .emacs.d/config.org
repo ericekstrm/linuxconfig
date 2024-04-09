@@ -250,6 +250,17 @@
        :after evil
        :config
        (evil-collection-init '(buff-menu ivy org)))
+
+     (use-package evil-org
+       :ensure t
+       :after org
+       :hook (org-mode . (lambda () evil-org-mode)))
+
+     (use-package evil-org-agenda
+       :ensure nil
+       :after org-agenda
+       :config
+       (evil-org-agenda-set-keys))
    #+end_src
 
    '_' should be part of words in prog-mode.
@@ -523,6 +534,7 @@
    #+begin_src emacs-lisp
      (setq org-log-done 'time)        ; Add 'closed' time to completed TODOs
      (setq calendar-week-start-day 1) ; Week starts on mondays
+     (setq org-agenda-files '("~/org/"))
    #+end_src
    
    When editing code blocks, the new buffer should be created as a split in the current window.
