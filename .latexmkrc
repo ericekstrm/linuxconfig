@@ -6,4 +6,3 @@ $dvi_mode = 0;
 $postscript_mode = 0;
 
 $out_dir='build';
-$success_cmd = 'cp %D $(basename $(echo %T | tr / _) .tex).pdf';
