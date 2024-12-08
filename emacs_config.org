@@ -322,13 +322,13 @@
        :init
        (ivy-mode 1)
        :bind (:map ivy-minibuffer-map
-		   ("TAB" . ivy-alt-done)
-		   ("RET" . ivy-alt-done)
-		   ("C-k" . ivy-previous-line)
-		   ("C-j" . ivy-next-line)
-		   :map ivy-switch-buffer-map
-		   ("C-k" . ivy-previous-line)
-		   ("C-j" . ivy-next-line))
+                   ;; ("TAB" . ivy-alt-done)
+                   ("RET" . ivy-alt-done)
+                   ("C-k" . ivy-previous-line)
+                   ("C-j" . ivy-next-line)
+                   :map ivy-switch-buffer-map
+                   ("C-k" . ivy-previous-line)
+                   ("C-j" . ivy-next-line))
        :custom
        (ivy-initial-inputs-alist nil)                             ; remove the '^' as inital char in buffer
        (ivy-re-builders-alist '((t . ivy--regex-ignore-order))))  ; add some flexibility to ivy search
@@ -382,13 +382,13 @@
            (lsp-headerline-breadcrumb-enable nil)
            (lsp-diagnostics-provider :none)
            (lsp-eldoc-enable-hover nil)
+           (lsp-enable-indentation nil)
+           (lsp-enable-on-type-formatting nil)
            :bind ((:map evil-normal-state-map
                         ("gi" . lsp-find-definition)
                         ("gd" . lsp-find-declaration)
                         ("gb" . evil-jump-backward))))
        )
-  
-
 
    #+end_src
    
