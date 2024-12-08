@@ -4,8 +4,8 @@
   packages and el-files in there.
 
   #+begin_src emacs-lisp
-    (add-to-list 'custom-theme-load-path "~/linuxconfig")
-    (setq load-path (cons "~/linuxconfig/emacs-files" load-path))
+    (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
+    (setq load-path (cons "~/.emacs.d/extra-modes" load-path))
     (setq gc-cons-threshold (* 50 1000 1000))
   #+end_src
 ** elisp functions
@@ -13,8 +13,8 @@
    Some useful elisp functions and stuff.
    
    #+begin_src emacs-lisp
-     ;; check emacs versions
 
+     ;; check emacs versions
      (defun emacs-version< (val1)
        (version< emacs-version val1))
 
@@ -64,17 +64,22 @@
          (setq mouse-wheel-scroll-amount '(3, ((shift) . 1) ((control) . nil))))
    #+end_src
 
+   Fix scratch buffer
+   
+   #+begin_src emacs-lisp
+     (setq initial-major-mode 'org-mode)
+     (setq initial-scratch-message "")
+   #+end_src
+
    Unsorted stuff
    
    #+begin_src emacs-lisp
 
-     (setq left-fringe-width 0) ;; remove pixels before line numbers on the left side. 
+     (setq left-fringe-width 0) ; remove pixels before line numbers on the left side. 
 
-     (font-lock-add-keywords    ;; add function calls to list of highlighted stuff
+     (font-lock-add-keywords    ; add function calls to list of highlighted stuff
       'cpp-mode
       '(("\\<\\(\\sw+\\) ?(" 1 'font-lock-function-name-face)))
-
-     (load-theme 'my t) ;; Load my custom theme
 
      (setq help-window-select t)
    #+end_src
@@ -84,7 +89,7 @@
    #+begin_src emacs-lisp
      (defun reload-config()
        (interactive)
-       (shell-command "rm ~/linuxconfig/emacs_config.el")
+       (shell-command "rm ~/.emacs.d/config.el")
        (restart-emacs))
 
      (defun server-shutdown ()
@@ -116,7 +121,7 @@
    #+begin_src emacs-lisp
      (set-face-attribute 'default nil :height 90)
      (pcase my-machine-name
-       ("kit" (set-face-attribute 'default nil :height 130))
+       ("kit" (set-face-attribute 'default nil :height 110))
        ("kube" (set-face-attribute 'default nil :height 90)))
      ;; Set initial window size
      (setq initial-frame-alist '((width . 110) (height . 60)))
@@ -142,11 +147,11 @@
 
    #+begin_src emacs-lisp
      (setq backup-directory-alist `(("." . "~/.emacs.d/backup-files")))
-     (setq version-control t     ;; Use version numbers for backups.
-	   kept-new-versions 10  ;; Number of newest versions to keep.
-	   kept-old-versions 0   ;; Number of oldest versions to keep.
-	   delete-old-versions t ;; Don't ask to delete excess backup versions.
-	   backup-by-copying t)  ;; Copy all files, don't rename them
+     (setq version-control t     ; Use version numbers for backups.
+	   kept-new-versions 10  ; Number of newest versions to keep.
+	   kept-old-versions 0   ; Number of oldest versions to keep.
+	   delete-old-versions t ; Don't ask to delete excess backup versions.
+	   backup-by-copying t)  ; Copy all files, don't rename them
      (setq vc-make-backup-files t)
    #+end_src
    
@@ -182,11 +187,30 @@
       (key-chord-safety-interval-forward 0.05))
   #+end_src
 
+** Buffer Stack
+
+  #+begin_src emacs-lisp
+    (use-package buffer-flip
+      :ensure t
+      :bind  (("C-<tab>" . buffer-flip)
+              :map buffer-flip-map
+              ( "C-<tab>" .   buffer-flip-forward) 
+              ( "C-S-<tab>" . buffer-flip-backward) 
+              ( "C-ESC" .     buffer-flip-abort))
+      :custom
+      (buffer-flip-skip-patterns '("^\\*.*\\*$")))
+      ;; :config
+      ;; (setq buffer-flip-skip-patterns
+      ;;       '("^\\*helm\\b"
+      ;;         "^\\*swiper\\*$")))
+  #+end_src
+   
 ** Doom-Themes
 
    #+begin_src emacs-lisp
      (use-package doom-themes
        :ensure t)
+     (load-theme 'my t) ;; Load my custom theme
    #+end_src
    
 ** Evil
@@ -225,6 +249,17 @@
        :after evil
        :config
        (evil-collection-init '(buff-menu ivy org)))
+
+     (use-package evil-org
+       :ensure t
+       :after org
+       :hook (org-mode . (lambda () evil-org-mode)))
+
+     (use-package evil-org-agenda
+       :ensure nil
+       :after org-agenda
+       :config
+       (evil-org-agenda-set-keys))
    #+end_src
 
    '_' should be part of words in prog-mode.
@@ -249,7 +284,7 @@
    
 *** Extra commands
     
-   Adds command ~g c~ to comment out code.
+   Adds command ~gc~ to comment out code.
 
    #+begin_src emacs-lisp
      (use-package evil-commentary
@@ -260,9 +295,9 @@
        (evil-commentary-mode))
    #+end_src
 
-   Adds ~surround~ as a text object with ~s~. For example ~c s ( [~ to replace the
+   Adds ~surround~ as a text object with ~s~. For example ~cs([~ to replace the
    surrounding parenthesis with square brackets
-
+   
    #+begin_src emacs-lisp
      (use-package evil-surround
        :ensure t
@@ -279,6 +314,16 @@
         ?\} '("{" . "}")
         ?\[ '("[" . "]")
         ?\] '("[" . "]")))
+   #+end_src
+   
+   Adds command to align text based on a character with ~gl~. For example ~glip=~ to align all lines
+   in a paragraph on the equal sign.
+
+   #+begin_src emacs-lisp
+     (use-package evil-lion
+       :ensure t
+       :config
+       (evil-lion-mode))
    #+end_src
    
 *** Extra text objects
@@ -477,16 +522,16 @@
         (interactive)
         (insert "\\begin{lstlisting}[style=code, gobble=4]\n")
         (save-excursion
-          (insert "\n\\end{lstlsting}"))
+          (insert "\n\\end{lstlisting}"))
         (evil-insert 1)
         (indent-for-tab-command))
 
       ;; Insert beamer columns
       (defun latex-columns ()
         (interactive)
-        (insert "\\begin{columns}\n\\begin{column}{0.5\\textwidth}\n")
+        (insert "\\begin{columns}\n\\column{0.5\\textwidth}\n")
         (save-excursion
-          (insert "\n\\end{column}\n\\end{columns}"))
+          (insert "\n\\column{0.5\\textwidth}\n\\end{columns}"))
         (evil-insert 1)
         (indent-for-tab-command))
     #+end_src
@@ -498,6 +543,7 @@
    #+begin_src emacs-lisp
      (setq org-log-done 'time)        ; Add 'closed' time to completed TODOs
      (setq calendar-week-start-day 1) ; Week starts on mondays
+     (setq org-agenda-files '("~/org/"))
    #+end_src
    
    When editing code blocks, the new buffer should be created as a split in the current window.
@@ -534,7 +580,7 @@
   Clean up after the init process. 
   
   #+begin_src emacs-lisp
-    (setq gc-cons-threshold (* 2 1000 1000))   ;; Reset garbage collection threshold
+    (setq gc-cons-threshold (* 2 1000 1000))   ; Reset garbage collection threshold
 
   #+end_src
   
@@ -545,7 +591,7 @@
   | ~C-c left~  | Move to previous window configuration                       |
   | ~C-c right~ | Move the the next window configuration                      |
 
-* Stuff to do [12%]
+* Stuff to do [8%]
 ** TODO check out Magit (for real)
 ** TODO check out the emacs package Projectile
 ** TODO Hydra för att skapa tangentbordkombinationer med en gemensam startknapp?
@@ -589,3 +635,7 @@
 ** TODO lsp/clangd cant find implementation???
 ** TODO change color of matching paren to cursor color
 ** TODO move 'uniquify' to use-package?
+** TODO Fixa spell-check
+
+   https://www.emacswiki.org/emacs/FlySpell
+   https://stackoverflow.com/questions/27544869/how-do-i-change-ispell-private-dictionary
