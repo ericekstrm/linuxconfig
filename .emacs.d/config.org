@@ -1,5 +1,5 @@
 * Basics
-
+  
   Add an extra folder to the load path so that emacs has access to the files there. Put extra emacs
   packages and el-files in there.
 
@@ -209,6 +209,7 @@
 
    #+begin_src emacs-lisp
      (use-package doom-themes
+       :defer t
        :ensure t)
      (load-theme 'my t) ;; Load my custom theme
    #+end_src
@@ -364,16 +365,17 @@
    #+begin_src emacs-lisp
      (use-package ivy
        :ensure t
+       :defer t 
        :init
        (ivy-mode 1)
        :bind (:map ivy-minibuffer-map
-		   ("TAB" . ivy-alt-done)
-		   ("RET" . ivy-alt-done)
-		   ("C-k" . ivy-previous-line)
-		   ("C-j" . ivy-next-line)
-		   :map ivy-switch-buffer-map
-		   ("C-k" . ivy-previous-line)
-		   ("C-j" . ivy-next-line))
+                   ("TAB" . ivy-alt-done)
+                   ("RET" . ivy-alt-done)
+                   ("C-k" . ivy-previous-line)
+                   ("C-j" . ivy-next-line)
+                   :map ivy-switch-buffer-map
+                   ("C-k" . ivy-previous-line)
+                   ("C-j" . ivy-next-line))
        :custom
        (ivy-initial-inputs-alist nil)                             ; remove the '^' as inital char in buffer
        (ivy-re-builders-alist '((t . ivy--regex-ignore-order))))  ; add some flexibility to ivy search
@@ -403,6 +405,7 @@
    #+begin_src emacs-lisp
      (use-package ivy-rich
        :ensure t
+       :after ivy
        :config
        ;; Nothing fancy in switch-buffer list. 
        (ivy-rich-set-columns 'ivy-switch-buffer
@@ -418,6 +421,7 @@
      (if (emacs-version>= "29.1")
          (use-package lsp-mode
            :ensure t
+           :defer t
            :hook
            (c++-mode . lsp-deferred)
            (c-mode . lsp-deferred)
@@ -432,7 +436,7 @@
                         ("gd" . lsp-find-declaration)
                         ("gb" . evil-jump-backward))))
        )
-  
+
 
 
    #+end_src
@@ -440,10 +444,15 @@
 ** Telephone line
 
    Set a nice mode line style. [[https://github.com/dbordak/telephone-line][telephone-line]]
-
+ii
    #+begin_src emacs-lisp 
      (use-package telephone-line
        :ensure t
+       :custom
+       (telephone-line-rhs
+        '((nil    . (telephone-line-misc-info-segment))
+          (accent . (telephone-line-major-mode-segment))
+          (evil   . (telephone-line-position-segment))))
        :config
        (telephone-line-mode 1))
    #+end_src
@@ -484,9 +493,9 @@
    #+end_src
 
    #+begin_src emacs-lisp
-       (autoload 'glsl-mode "glsl-mode" nil t)
-       (add-to-list 'auto-mode-alist '("\\.frag\\'" . glsl-mode))
-       (add-to-list 'auto-mode-alist '("\\.vert\\'" . glsl-mode))
+     (autoload 'glsl-mode "glsl-mode" nil t)
+     (add-to-list 'auto-mode-alist '("\\.frag\\'" . glsl-mode))
+     (add-to-list 'auto-mode-alist '("\\.vert\\'" . glsl-mode))
    #+end_src
 ** Latex Mode
    Basic settings for latex.
@@ -564,6 +573,17 @@
    
    #+begin_src emacs-lisp
      (setq org-adapt-indentation t)
+   #+end_src
+
+   Allows running python inside org. write "#+begin_src python :results output" to start a code
+   block that can output results.
+   
+   | ~C-c C-c~ | Run code         |
+   | ~C-c '    | Open code editor |
+
+   #+begin_src emacs-lisp
+     (use-package ob-python
+       :custom (org-babel-python-command "python3"))
    #+end_src
    
 ** Text Mode
